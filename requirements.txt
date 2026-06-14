@@ -1,3 +1,4 @@
 discord.py
-google-generativeai
 pytz
+pymongo
+dnspython
