@@ -457,17 +457,17 @@ async def fake_ban(interaction: discord.Interaction, участник: discord.M
 @tree.command(name="отправить", description="Отправить участника в страну")
 @app_commands.describe(участник="Участник", страна="Страна на русском")
 async def отправить(interaction: discord.Interaction, участник: discord.Member, страна: str):
+    await interaction.response.defer()
     роли = [r.name for r in interaction.user.roles]
     if not any(r in роли for r in SEND_ROLES):
-        await interaction.response.send_message("❌ У тебя нет прав!", ephemeral=True)
+        await interaction.followup.send("❌ У тебя нет прав!", ephemeral=True)
         return
     страна_норм = страна.strip().capitalize()
     if страна_норм not in СПИСОК_СТРАН:
         список = ", ".join(СПИСОК_СТРАН)
-        await interaction.response.send_message(
-            f"❌ Страна не найдена! Доступные страны:\n{список}", ephemeral=True)
+        await interaction.followup.send(f"❌ Страна не найдена! Доступные страны:\n{список}", ephemeral=True)
         return
-    await interaction.response.send_message(
+    await interaction.followup.send(
         f"✈️ {участник.mention} **отправлен в {страна_норм}!**\n"
         f"🧳 Счастливого пути!")
 
