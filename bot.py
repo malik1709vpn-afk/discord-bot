@@ -438,10 +438,11 @@ class ExitShopButton(discord.ui.Button):
 @tree.command(name="баланс", description="Посмотреть баланс")
 @app_commands.describe(участник="Участник (необязательно)")
 async def баланс(interaction: discord.Interaction, участник: discord.Member = None):
+    await interaction.response.defer()
     цель = участник if участник else interaction.user
     bal = get_balance(цель.id)
     income = get_hourly_income(цель.id)
-    await interaction.response.send_message(
+    await interaction.followup.send(
         f"💰 **{цель.name}**\n"
         f"Баланс: **{bal} ликкеров**\n"
         f"📈 Доход в час: **{income} ликкеров**")
@@ -718,4 +719,3 @@ async def бойцы(interaction: discord.Interaction):
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
-
