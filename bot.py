@@ -474,18 +474,20 @@ async def отправить(interaction: discord.Interaction, участник:
 @tree.command(name="отобрать", description="Отобрать ликкеры у участника")
 @app_commands.describe(участник="Участник", сумма="Сумма")
 async def отобрать(interaction: discord.Interaction, участник: discord.Member, сумма: int):
+    await interaction.response.defer()
     роли = [r.name for r in interaction.user.roles]
     if "Владелец Сервера" not in роли:
-        await interaction.response.send_message("❌ У тебя нет прав!", ephemeral=True)
+        await interaction.followup.send("❌ У тебя нет прав!", ephemeral=True)
         return
     if сумма <= 0:
-        await interaction.response.send_message("❌ Сумма должна быть больше 0!", ephemeral=True)
+        await interaction.followup.send("❌ Сумма должна быть больше 0!", ephemeral=True)
         return
     bal = get_balance(участник.id)
     новый_баланс = max(0, bal - сумма)
     set_balance(участник.id, новый_баланс)
-    await interaction.response.send_message(
-        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!\n"
+    await interaction.followup.send(
+        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!
+"
         f"💰 Новый баланс: **{новый_баланс} ликкеров**")
 
 @tree.command(name="топ", description="Топ 10 игроков по ликкерам")
