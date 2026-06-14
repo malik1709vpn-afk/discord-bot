@@ -489,11 +489,15 @@ async def отобрать(interaction: discord.Interaction, участник: d
         await interaction.followup.send("❌ Сумма должна быть больше 0!", ephemeral=True)
         return
     bal = get_balance(участник.id)
+    реально_отобрано = min(сумма, bal)
     новый_баланс = max(0, bal - сумма)
     set_balance(участник.id, новый_баланс)
+    мой_баланс = get_balance(interaction.user.id)
+    set_balance(interaction.user.id, мой_баланс + реально_отобрано)
     await interaction.followup.send(
-        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!\n"
-        f"💰 Новый баланс: **{новый_баланс} ликкеров**")
+        f"💀 У {участник.mention} отобрано **{реально_отобрано} ликкеров**!\n"
+        f"💰 Баланс {участник.name}: **{новый_баланс} ликкеров**\n"
+        f"💰 Твой баланс: **{мой_баланс + реально_отобрано} ликкеров**")
 
 @tree.command(name="топ", description="Топ 10 игроков по ликкерам")
 async def топ(interaction: discord.Interaction):
