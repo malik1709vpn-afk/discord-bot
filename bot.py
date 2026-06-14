@@ -8,15 +8,21 @@ import asyncio
 import pytz
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
+from pymongo import MongoClient
 
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
+MONGODB_URI = os.environ.get("MONGODB_URI")
+
+# MongoDB подключение
+mongo = MongoClient(MONGODB_URI)
+db = mongo["discord_bot"]
+balances_col = db["balances"]
 
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
-BALANCE_FILE = "balance.json"
 CASINO_CHANNELS = ["казик", "казино", "лучшие-по-казику", "чемпионат-по-казику"]
 
 СТРАНЫ = [
@@ -67,24 +73,18 @@ SHOP_ROLES = [
     (1000000, "Бог Казика", "👾"),
 ]
 
-def load_balance():
-    if os.path.exists(BALANCE_FILE):
-        with open(BALANCE_FILE, "r") as f:
-            return json.load(f)
-    return {}
-
-def save_balance(data):
-    with open(BALANCE_FILE, "w") as f:
-        json.dump(data, f)
-
 def get_balance(user_id):
-    data = load_balance()
-    return data.get(str(user_id), 100)
+    doc = balances_col.find_one({"user_id": str(user_id)})
+    if doc:
+        return doc["balance"]
+    balances_col.insert_one({"user_id": str(user_id), "balance": 100})
+    return 100
 
 def set_balance(user_id, amount):
-    data = load_balance()
-    data[str(user_id)] = amount
-    save_balance(data)
+    balances_col.update_one(
+        {"user_id": str(user_id)},
+        {"$set": {"balance": amount}},
+        upsert=True)
 
 def has_role(member, role_name):
     return any(r.name == role_name for r in member.roles)
@@ -104,10 +104,7 @@ async def daily_bonus():
                                    (60 - now.minute - 1) * 60 +
                                    (60 - now.second))
         await asyncio.sleep(seconds_until_midnight)
-        data = load_balance()
-        for user_id in data:
-            data[user_id] += 100
-        save_balance(data)
+        balances_col.update_many({}, {"$inc": {"balance": 100}})
         await asyncio.sleep(60)
 
 class HealthHandler(BaseHTTPRequestHandler):
@@ -129,7 +126,6 @@ async def on_ready():
     print(f"Бот запущен: {client.user}")
     client.loop.create_task(daily_bonus())
 
-# Кнопка выйти
 class ExitView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=60)
@@ -150,7 +146,6 @@ class ExitView(discord.ui.View):
         except:
             pass
 
-# Главное меню
 class ShopMainView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=60)
@@ -176,7 +171,6 @@ class ShopMainView(discord.ui.View):
         except:
             pass
 
-# Страница ролей
 class ShopRolesView(discord.ui.View):
     def __init__(self, page, member):
         super().__init__(timeout=60)
@@ -315,7 +309,6 @@ class ExitShopButton(discord.ui.Button):
         except:
             pass
 
-# Команды
 @tree.command(name="баланс", description="Посмотреть свой баланс")
 async def баланс(interaction: discord.Interaction):
     bal = get_balance(interaction.user.id)
