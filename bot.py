@@ -14,7 +14,7 @@ DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 MONGODB_URI = os.environ.get("MONGODB_URI")
 
 # MongoDB подключение
-mongo = MongoClient(MONGODB_URI)
+mongo = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
 db = mongo["discord_bot"]
 balances_col = db["balances"]
 
@@ -454,21 +454,27 @@ async def fake_ban(interaction: discord.Interaction, участник: discord.M
 
 СПИСОК_СТРАН = [с[0] for с in СТРАНЫ]
 
+async def страна_autocomplete(interaction: discord.Interaction, current: str):
+    return [
+        app_commands.Choice(name=с, value=с)
+        for с in СПИСОК_СТРАН
+        if current.lower() in с.lower()
+    ][:25]
+
 @tree.command(name="отправить", description="Отправить участника в страну")
 @app_commands.describe(участник="Участник", страна="Страна на русском")
+@app_commands.autocomplete(страна=страна_autocomplete)
 async def отправить(interaction: discord.Interaction, участник: discord.Member, страна: str):
     await interaction.response.defer()
     роли = [r.name for r in interaction.user.roles]
     if not any(r in роли for r in SEND_ROLES):
         await interaction.followup.send("❌ У тебя нет прав!", ephemeral=True)
         return
-    страна_норм = страна.strip().capitalize()
-    if страна_норм not in СПИСОК_СТРАН:
-        список = ", ".join(СПИСОК_СТРАН)
-        await interaction.followup.send(f"❌ Страна не найдена! Доступные страны:\n{список}", ephemeral=True)
+    if страна not in СПИСОК_СТРАН:
+        await interaction.followup.send("❌ Страна не найдена!", ephemeral=True)
         return
     await interaction.followup.send(
-        f"✈️ {участник.mention} **отправлен в {страна_норм}!**\n"
+        f"✈️ {участник.mention} **отправлен в {страна}!**\n"
         f"🧳 Счастливого пути!")
 
 @tree.command(name="отобрать", description="Отобрать ликкеры у участника")
@@ -517,3 +523,4 @@ async def магазин(interaction: discord.Interaction):
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
+
