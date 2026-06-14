@@ -475,7 +475,7 @@ async def отправить(interaction: discord.Interaction, участник:
 @app_commands.describe(участник="Участник", сумма="Сумма")
 async def отобрать(interaction: discord.Interaction, участник: discord.Member, сумма: int):
     роли = [r.name for r in interaction.user.roles]
-    if "Создатель Сервера" not in роли:
+    if "Владелец Сервера" not in роли:
         await interaction.response.send_message("❌ У тебя нет прав!", ephemeral=True)
         return
     if сумма <= 0:
@@ -516,4 +516,3 @@ async def магазин(interaction: discord.Interaction):
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
-
