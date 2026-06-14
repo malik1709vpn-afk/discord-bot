@@ -452,6 +452,8 @@ async def fake_ban(interaction: discord.Interaction, участник: discord.M
     await asyncio.sleep(67)
     await interaction.channel.send(f"✅ {участник.mention} бан снят!")
 
+СПИСОК_СТРАН = [с[0] for с in СТРАНЫ]
+
 @tree.command(name="отправить", description="Отправить участника в страну")
 @app_commands.describe(участник="Участник", страна="Страна на русском")
 async def отправить(interaction: discord.Interaction, участник: discord.Member, страна: str):
@@ -460,9 +462,49 @@ async def отправить(interaction: discord.Interaction, участник:
         await interaction.response.send_message("❌ У тебя нет прав!", ephemeral=True)
         return
     страна_норм = страна.strip().capitalize()
+    if страна_норм not in СПИСОК_СТРАН:
+        список = ", ".join(СПИСОК_СТРАН)
+        await interaction.response.send_message(
+            f"❌ Страна не найдена! Доступные страны:\n{список}", ephemeral=True)
+        return
     await interaction.response.send_message(
         f"✈️ {участник.mention} **отправлен в {страна_норм}!**\n"
         f"🧳 Счастливого пути!")
+
+@tree.command(name="отобрать", description="Отобрать ликкеры у участника")
+@app_commands.describe(участник="Участник", сумма="Сумма")
+async def отобрать(interaction: discord.Interaction, участник: discord.Member, сумма: int):
+    роли = [r.name for r in interaction.user.roles]
+    if "Создатель Сервера" not in роли:
+        await interaction.response.send_message("❌ У тебя нет прав!", ephemeral=True)
+        return
+    if сумма <= 0:
+        await interaction.response.send_message("❌ Сумма должна быть больше 0!", ephemeral=True)
+        return
+    bal = get_balance(участник.id)
+    новый_баланс = max(0, bal - сумма)
+    set_balance(участник.id, новый_баланс)
+    await interaction.response.send_message(
+        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!\n"
+        f"💰 Новый баланс: **{новый_баланс} ликкеров**")
+
+@tree.command(name="топ", description="Топ 10 игроков по ликкерам")
+async def топ(interaction: discord.Interaction):
+    await interaction.response.defer()
+    top_users = list(balances_col.find().sort("balance", -1).limit(10))
+    if not top_users:
+        await interaction.followup.send("❌ Нет данных!", ephemeral=True)
+        return
+    текст = "🏆 **Топ 10 по ликкерам:**\n\n"
+    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+    for i, doc in enumerate(top_users):
+        try:
+            user = await client.fetch_user(int(doc["user_id"]))
+            имя = user.name
+        except:
+            имя = f"Пользователь {doc['user_id']}"
+        текст += f"{medals[i]} **{имя}** — {doc['balance']} ликкеров\n"
+    await interaction.followup.send(текст)
 
 @tree.command(name="магазин", description="Открыть магазин")
 async def магазин(interaction: discord.Interaction):
@@ -474,3 +516,4 @@ async def магазин(interaction: discord.Interaction):
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
+
