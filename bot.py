@@ -486,8 +486,7 @@ async def отобрать(interaction: discord.Interaction, участник: d
     новый_баланс = max(0, bal - сумма)
     set_balance(участник.id, новый_баланс)
     await interaction.followup.send(
-        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!
-"
+        f"💀 У {участник.mention} отобрано **{сумма} ликкеров**!\n"
         f"💰 Новый баланс: **{новый_баланс} ликкеров**")
 
 @tree.command(name="топ", description="Топ 10 игроков по ликкерам")
@@ -518,4 +517,3 @@ async def магазин(interaction: discord.Interaction):
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
-
