@@ -125,6 +125,94 @@ RARITY_COLORS = {
     "Мифический": "🟥", "Легендарный": "🟨", "Ультра легендарный": "🟧", "Секретный": "⬛",
 }
 
+# Цены на удачу (процент -> цена за бокс доп.)
+LUCK_PRICES = {
+    10: 50, 20: 120, 30: 220, 40: 350, 50: 500,
+    60: 700, 70: 1000, 80: 1400, 90: 2000,
+}
+
+# ===== ЗАДАЧКИ ДЛЯ БОЯ =====
+QUIZ_QUESTIONS = [
+    {
+        "question": "🧮 Сколько будет 17 × 13?",
+        "options": ["211", "221", "231", "241"],
+        "answer": 1,
+    },
+    {
+        "question": "🧮 Корень из 289?",
+        "options": ["15", "16", "17", "18"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 256 ÷ 8?",
+        "options": ["28", "30", "32", "34"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 15² + 8² = ?",
+        "options": ["269", "279", "289", "299"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 3⁷?",
+        "options": ["2187", "2197", "2207", "2217"],
+        "answer": 0,
+    },
+    {
+        "question": "🧮 Сколько будет 144 × 7?",
+        "options": ["988", "998", "1008", "1018"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 log₂(512) = ?",
+        "options": ["7", "8", "9", "10"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 19 × 19?",
+        "options": ["341", "351", "361", "371"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 1000 - 387?",
+        "options": ["603", "613", "623", "633"],
+        "answer": 1,
+    },
+    {
+        "question": "🧮 Факториал 6 (6!) = ?",
+        "options": ["620", "700", "720", "740"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 48 × 25?",
+        "options": ["1100", "1150", "1200", "1250"],
+        "answer": 2,
+    },
+    {
+        "question": "🧮 Сколько будет 2^10?",
+        "options": ["512", "1024", "2048", "256"],
+        "answer": 1,
+    },
+    {
+        "question": "🧮 Сколько будет 37 × 43?",
+        "options": ["1581", "1591", "1601", "1611"],
+        "answer": 1,
+    },
+    {
+        "question": "🧮 Сколько будет 999 × 9?",
+        "options": ["8981", "8991", "9001", "9011"],
+        "answer": 1,
+    },
+    {
+        "question": "🧮 Корень из 1764?",
+        "options": ["40", "42", "44", "46"],
+        "answer": 1,
+    },
+]
+
+# Активные бои: {(user1_id, user2_id): данные}
+active_battles = {}
+
 # ===== ФАЙЛОВЫЕ ФУНКЦИИ =====
 def load_file(path):
     if os.path.exists(path):
@@ -183,6 +271,15 @@ def get_best_deck(user_id):
                 best = deck
                 best_name = name
     return best_name, best
+
+def get_used_fighters_in_decks(user_id):
+    """Возвращает список имён бойцов, уже занятых в колодах"""
+    decks = get_decks(user_id)
+    used = []
+    for deck in decks.values():
+        for f in deck:
+            used.append(f["name"])
+    return used
 
 def roll_fighter(luck_bonus=0):
     chances = []
@@ -374,8 +471,9 @@ class ConfirmBuyView(discord.ui.View):
             await interaction.response.edit_message(content="❌ Ошибка выдачи роли! Проверь иерархию.", view=BackExitView())
             return
         set_balance(interaction.user.id, bal - self.price)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.edit_message(
-            content=f"🎉 Роль **{self.emoji} {self.name}** получена!\n💰 Остаток: **{bal - self.price}**",
+            content=f"🎉 Роль **{self.emoji} {self.name}** получена!\n💰 Остаток: **{new_bal}**",
             view=BackExitView())
 
     @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
@@ -483,9 +581,16 @@ class DeckEditView(discord.ui.View):
         if not self.f_list:
             await interaction.response.send_message("❌ У тебя нет бойцов! Открой `/боксы`", ephemeral=True)
             return
+        # Фильтруем бойцов занятых в других колодах
+        used = get_used_fighters_in_decks(self.user_id)
+        current_deck_names = [f["name"] for f in self.deck]
+        available = [f for f in self.f_list if f["name"] not in used or f["name"] in current_deck_names]
+        if not available:
+            await interaction.response.send_message("❌ Все бойцы уже в других колодах!", ephemeral=True)
+            return
         await interaction.response.edit_message(
             content=f"➕ **Выбери бойца для колоды {self.deck_name}:**",
-            view=AddFighterView(self.deck_name, self.user_id, self.deck, self.f_list, 0))
+            view=AddFighterView(self.deck_name, self.user_id, self.deck, available, 0))
 
     @discord.ui.button(label="🏆 Сильнейшая", style=discord.ButtonStyle.primary, row=0)
     async def best_deck_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -493,7 +598,15 @@ class DeckEditView(discord.ui.View):
         if not f_list:
             await interaction.response.send_message("❌ Нет бойцов!", ephemeral=True)
             return
-        sorted_f = sorted(f_list, key=lambda x: x.get("power", 0), reverse=True)
+        # Берём бойцов, не занятых в других колодах (кроме текущей)
+        decks = get_decks(self.user_id)
+        other_used = []
+        for dk_name, dk in decks.items():
+            if dk_name != self.deck_name:
+                for f in dk:
+                    other_used.append(f["name"])
+        available = [f for f in f_list if f["name"] not in other_used]
+        sorted_f = sorted(available, key=lambda x: x.get("power", 0), reverse=True)
         best = sorted_f[:5]
         save_deck(self.user_id, self.deck_name, best)
         текст = f"🏆 **Колода {self.deck_name}** — сильнейшие бойцы:\n\n"
@@ -631,59 +744,392 @@ class ExitDeckButton(discord.ui.Button):
         except:
             pass
 
-# ===== БОЙ =====
-class BattleDeckView(discord.ui.View):
-    def __init__(self, opponent: discord.Member):
-        super().__init__(timeout=60)
-        self.opponent = opponent
-        for name in ["К1", "К2", "К3", "К4", "К5"]:
-            self.add_item(BattleDeckButton(name, opponent))
-        self.add_item(CancelBattleButton())
+# ===== НОВАЯ СИСТЕМА БОЯ =====
 
-class BattleDeckButton(discord.ui.Button):
-    def __init__(self, deck_name, opponent):
-        super().__init__(label=deck_name, style=discord.ButtonStyle.primary)
-        self.deck_name = deck_name
+class BattleInviteView(discord.ui.View):
+    """Приглашение на бой — показывается оппоненту"""
+    def __init__(self, challenger: discord.Member, opponent: discord.Member, bet: int, channel):
+        super().__init__(timeout=60)
+        self.challenger = challenger
         self.opponent = opponent
+        self.bet = bet
+        self.channel = channel
+
+    @discord.ui.button(label="✅ Принять", style=discord.ButtonStyle.success)
+    async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.opponent.id:
+            await interaction.response.send_message("❌ Это не твой вызов!", ephemeral=True)
+            return
+        # Проверяем балансы
+        ch_bal = get_balance(self.challenger.id)
+        op_bal = get_balance(self.opponent.id)
+        if ch_bal < self.bet:
+            await interaction.response.edit_message(
+                content=f"❌ У **{self.challenger.name}** не хватает ликкеров для ставки!", view=None)
+            return
+        if op_bal < self.bet:
+            await interaction.response.edit_message(
+                content=f"❌ У тебя не хватает ликкеров! Нужно **{self.bet}**", view=None)
+            return
+        # Снимаем ставки
+        set_balance(self.challenger.id, ch_bal - self.bet)
+        set_balance(self.opponent.id, op_bal - self.bet)
+        await interaction.response.edit_message(
+            content=f"⚔️ **{self.challenger.name}** vs **{self.opponent.name}**\n💰 Ставка: **{self.bet}** ликкеров каждый\n\n{self.challenger.mention}, выбери колоду для боя:",
+            view=BattleDeckSelectView(self.challenger, self.opponent, self.bet, self.channel, phase="challenger"))
+
+    @discord.ui.button(label="❌ Отклонить", style=discord.ButtonStyle.danger)
+    async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.opponent.id:
+            await interaction.response.send_message("❌ Это не твой вызов!", ephemeral=True)
+            return
+        await interaction.response.edit_message(
+            content=f"❌ **{self.opponent.name}** отклонил вызов!", view=None)
+
+
+class BattleDeckSelectView(discord.ui.View):
+    """Выбор колоды для боя"""
+    def __init__(self, challenger: discord.Member, opponent: discord.Member, bet: int, channel,
+                 phase: str, challenger_deck=None, challenger_deck_name=None):
+        super().__init__(timeout=60)
+        self.challenger = challenger
+        self.opponent = opponent
+        self.bet = bet
+        self.channel = channel
+        self.phase = phase  # "challenger" или "opponent"
+        self.challenger_deck = challenger_deck
+        self.challenger_deck_name = challenger_deck_name
+
+        # Определяем чьи колоды показываем
+        current_user = challenger if phase == "challenger" else opponent
+        decks = get_decks(current_user.id)
+        for name in ["К1", "К2", "К3", "К4", "К5"]:
+            deck = decks.get(name, [])
+            if deck:
+                power = sum(f.get("power", 0) for f in deck)
+                self.add_item(BattleDeckChoiceButton(
+                    name, power, deck,
+                    challenger, opponent, bet, channel,
+                    phase, challenger_deck, challenger_deck_name))
+
+        self.add_item(BattleCancelRefundButton(challenger, opponent, bet))
+
+
+class BattleDeckChoiceButton(discord.ui.Button):
+    def __init__(self, deck_name, power, deck, challenger, opponent, bet, channel,
+                 phase, challenger_deck, challenger_deck_name):
+        super().__init__(label=f"{deck_name} 💪{power}", style=discord.ButtonStyle.primary)
+        self.deck_name = deck_name
+        self.deck = deck
+        self.challenger = challenger
+        self.opponent = opponent
+        self.bet = bet
+        self.channel = channel
+        self.phase = phase
+        self.challenger_deck = challenger_deck
+        self.challenger_deck_name = challenger_deck_name
 
     async def callback(self, interaction: discord.Interaction):
-        my_decks = get_decks(interaction.user.id)
-        my_deck = my_decks.get(self.deck_name, [])
-        if not my_deck:
-            await interaction.response.edit_message(
-                content=f"❌ Колода **{self.deck_name}** пуста! Выбери другую.", view=BattleDeckView(self.opponent))
+        expected_id = self.challenger.id if self.phase == "challenger" else self.opponent.id
+        if interaction.user.id != expected_id:
+            await interaction.response.send_message("❌ Сейчас не твой ход!", ephemeral=True)
             return
-        opp_deck_name, opp_deck = get_best_deck(self.opponent.id)
-        if not opp_deck:
+
+        if self.phase == "challenger":
+            # Challenger выбрал — теперь opponent выбирает
             await interaction.response.edit_message(
-                content=f"❌ У **{self.opponent.name}** нет колод! Бой невозможен.", view=None)
+                content=f"⚔️ **{self.challenger.name}** выбрал колоду **{self.deck_name}**!\n\n{self.opponent.mention}, теперь твоя очередь — выбери колоду:",
+                view=BattleDeckSelectView(
+                    self.challenger, self.opponent, self.bet, self.channel,
+                    phase="opponent",
+                    challenger_deck=self.deck,
+                    challenger_deck_name=self.deck_name))
+        else:
+            # Оба выбрали — запускаем бой
+            await interaction.response.edit_message(
+                content=f"⚔️ **Бой начинается!**\n\n**{self.challenger.name}** ({self.challenger_deck_name}) vs **{self.opponent.name}** ({self.deck_name})\n\n⏳ Идёт подготовка...",
+                view=None)
+            await asyncio.sleep(2)
+            msg = await interaction.original_response()
+            await run_battle(
+                msg, self.channel,
+                self.challenger, self.opponent, self.bet,
+                self.challenger_deck, self.challenger_deck_name,
+                self.deck, self.deck_name)
+
+
+class BattleCancelRefundButton(discord.ui.Button):
+    def __init__(self, challenger, opponent, bet):
+        super().__init__(label="❌ Отмена (возврат ставок)", style=discord.ButtonStyle.danger)
+        self.challenger = challenger
+        self.opponent = opponent
+        self.bet = bet
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id not in [self.challenger.id, self.opponent.id]:
+            await interaction.response.send_message("❌ Не твой бой!", ephemeral=True)
             return
-        my_power = sum(f.get("power", 0) for f in my_deck)
-        opp_power = sum(f.get("power", 0) for f in opp_deck)
-        my_atk = sum(f.get("atk", 0) for f in my_deck)
-        opp_atk = sum(f.get("atk", 0) for f in opp_deck)
-        my_def = sum(f.get("def", 0) for f in my_deck)
-        opp_def = sum(f.get("def", 0) for f in opp_deck)
-        my_score = my_power + random.randint(-20, 20)
-        opp_score = opp_power + random.randint(-20, 20)
-        winner = interaction.user if my_score >= opp_score else self.opponent
-        текст = (
-            f"⚔️ **БОЙ НАЧИНАЕТСЯ!**\n\n"
-            f"**{interaction.user.name}** (Колода {self.deck_name})\n"
-            f"⚔️ Атака: {my_atk} | 🛡️ Защита: {my_def} | 💪 Сила: {my_power}\n\n"
-            f"**VS**\n\n"
-            f"**{self.opponent.name}** (Колода {opp_deck_name})\n"
-            f"⚔️ Атака: {opp_atk} | 🛡️ Защита: {opp_def} | 💪 Сила: {opp_power}\n\n"
-            f"{'🏆 **ПОБЕДИТЕЛЬ: ' + winner.name + '**! 🎉' if winner == interaction.user else '💀 **ПОРАЖЕНИЕ!** ' + self.opponent.name + ' победил!'}"
+        # Возвращаем ставки
+        set_balance(self.challenger.id, get_balance(self.challenger.id) + self.bet)
+        set_balance(self.opponent.id, get_balance(self.opponent.id) + self.bet)
+        await interaction.response.edit_message(
+            content=f"❌ Бой отменён! Ставки возвращены:\n{self.challenger.mention}: +{self.bet}\n{self.opponent.mention}: +{self.bet}",
+            view=None)
+
+
+class QuizView(discord.ui.View):
+    """Задачка во время раунда"""
+    def __init__(self, question_data, challenger_id, opponent_id):
+        super().__init__(timeout=15)
+        self.question_data = question_data
+        self.challenger_id = challenger_id
+        self.opponent_id = opponent_id
+        self.answered = {}  # user_id -> bool (правильно/нет)
+        labels = ["🅐", "🅑", "🅒", "🅓"]
+        for i, opt in enumerate(question_data["options"]):
+            self.add_item(QuizAnswerButton(i, f"{labels[i]} {opt}", question_data["answer"], self))
+
+    def get_boost(self, user_id):
+        return self.answered.get(user_id, False)
+
+
+class QuizAnswerButton(discord.ui.Button):
+    def __init__(self, index, label, correct_index, quiz_view):
+        super().__init__(label=label[:80], style=discord.ButtonStyle.secondary)
+        self.index = index
+        self.correct_index = correct_index
+        self.quiz_view = quiz_view
+
+    async def callback(self, interaction: discord.Interaction):
+        uid = interaction.user.id
+        if uid not in [self.quiz_view.challenger_id, self.quiz_view.opponent_id]:
+            await interaction.response.send_message("❌ Ты не участник этого боя!", ephemeral=True)
+            return
+        if uid in self.quiz_view.answered:
+            await interaction.response.send_message("✋ Ты уже ответил!", ephemeral=True)
+            return
+        correct = self.index == self.correct_index
+        self.quiz_view.answered[uid] = correct
+        if correct:
+            await interaction.response.send_message("✅ Правильно! Твои бойцы получат буст в этом раунде!", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Неправильно! Буста не будет.", ephemeral=True)
+
+
+async def run_battle(message, channel, challenger: discord.Member, opponent: discord.Member,
+                     bet: int, ch_deck: list, ch_deck_name: str, op_deck: list, op_deck_name: str):
+    """Основная логика боя с раундами, задачками и анимацией"""
+
+    # Копируем бойцов с HP
+    def make_hp(deck):
+        fighters = []
+        for f in deck:
+            hp = f["def"] * 5 + f["power"] * 2
+            fighters.append({**f, "hp": hp, "max_hp": hp})
+        return fighters
+
+    ch_fighters = make_hp(ch_deck)
+    op_fighters = make_hp(op_deck)
+
+    round_num = 0
+    battle_log = []
+
+    while ch_fighters and op_fighters:
+        round_num += 1
+
+        # Задачка перед раундом
+        q = random.choice(QUIZ_QUESTIONS)
+        quiz_view = QuizView(q, challenger.id, opponent.id)
+
+        quiz_text = (
+            f"⚔️ **Раунд {round_num}**\n\n"
+            f"🧮 **ЗАДАЧА (15 сек):** {q['question']}\n"
+            f"Правильный ответ даст буст x1.5–2.0 твоим бойцам!\n\n"
         )
+        try:
+            await message.edit(content=quiz_text, view=quiz_view)
+        except:
+            pass
+
+        await asyncio.sleep(15)
+        quiz_view.stop()
+
+        # Определяем буст
+        ch_boost = round(random.uniform(1.5, 2.0), 2) if quiz_view.get_boost(challenger.id) else 1.0
+        op_boost = round(random.uniform(1.5, 2.0), 2) if quiz_view.get_boost(opponent.id) else 1.0
+
+        boost_text = ""
+        if ch_boost > 1.0:
+            boost_text += f"⚡ **{challenger.name}** ответил правильно! Буст x{ch_boost}!\n"
+        if op_boost > 1.0:
+            boost_text += f"⚡ **{opponent.name}** ответил правильно! Буст x{op_boost}!\n"
+
+        # Проводим раунд
+        round_text = f"⚔️ **Раунд {round_num}:**\n"
+        if boost_text:
+            round_text += boost_text + "\n"
+
+        # Каждый живой боец атакует случайного врага
+        round_events = []
+
+        # Атаки со стороны challenger
+        for attacker in list(ch_fighters):
+            if not op_fighters:
+                break
+            target = random.choice(op_fighters)
+            raw_dmg = max(1, int(attacker["atk"] * ch_boost) - target["def"] // 3)
+            dmg = max(1, raw_dmg + random.randint(-3, 5))
+            target["hp"] -= dmg
+            round_events.append(f"🔥 **{attacker['emoji']} {attacker['name']}** атакует → **{target['emoji']} {target['name']}** (-{dmg} HP)")
+            if target["hp"] <= 0:
+                round_events.append(f"💀 **{target['emoji']} {target['name']}** выбыл!")
+                op_fighters.remove(target)
+
+        # Атаки со стороны opponent
+        for attacker in list(op_fighters):
+            if not ch_fighters:
+                break
+            target = random.choice(ch_fighters)
+            raw_dmg = max(1, int(attacker["atk"] * op_boost) - target["def"] // 3)
+            dmg = max(1, raw_dmg + random.randint(-3, 5))
+            target["hp"] -= dmg
+            round_events.append(f"🗡️ **{attacker['emoji']} {attacker['name']}** атакует → **{target['emoji']} {target['name']}** (-{dmg} HP)")
+            if target["hp"] <= 0:
+                round_events.append(f"💀 **{target['emoji']} {target['name']}** выбыл!")
+                ch_fighters.remove(target)
+
+        round_text += "\n".join(round_events)
+
+        # Статус HP
+        round_text += f"\n\n**🩸 HP после раунда:**\n"
+        round_text += f"**{challenger.name}:** " + " | ".join([f"{f['emoji']}{f['hp']}" for f in ch_fighters]) if ch_fighters else f"**{challenger.name}:** —"
+        round_text += "\n"
+        round_text += f"**{opponent.name}:** " + " | ".join([f"{f['emoji']}{f['hp']}" for f in op_fighters]) if op_fighters else f"**{opponent.name}:** —"
+
+        battle_log.append(round_text)
+
+        try:
+            await message.edit(content=round_text[:1900], view=None)
+        except:
+            pass
+
+        if not ch_fighters or not op_fighters:
+            break
+
+        # Пауза между раундами
+        await asyncio.sleep(random.randint(5, 10))
+
+    # Итог
+    if ch_fighters and not op_fighters:
+        winner = challenger
+        loser = opponent
+    elif op_fighters and not ch_fighters:
+        winner = opponent
+        loser = challenger
+    else:
+        # Ничья (оба пали)
+        set_balance(challenger.id, get_balance(challenger.id) + bet)
+        set_balance(opponent.id, get_balance(opponent.id) + bet)
+        try:
+            await message.edit(
+                content=f"⚔️ **НИЧЬЯ!**\n\nОба потеряли всех бойцов одновременно!\n💰 Ставки возвращены: по **{bet}** ликкеров",
+                view=None)
+        except:
+            pass
+        return
+
+    prize = bet * 2
+    set_balance(winner.id, get_balance(winner.id) + prize)
+    w_bal = get_balance(winner.id)
+    l_bal = get_balance(loser.id)
+
+    result_text = (
+        f"🏆 **БОЙ ЗАВЕРШЁН!**\n\n"
+        f"🥇 **ПОБЕДИТЕЛЬ: {winner.name}**! 🎉\n"
+        f"💀 Проиграл: {loser.name}\n\n"
+        f"💰 {winner.mention} забирает **{prize}** ликкеров!\n"
+        f"📊 Баланс {winner.name}: **{w_bal}**\n"
+        f"📊 Баланс {loser.name}: **{l_bal}**"
+    )
+    try:
+        await message.edit(content=result_text[:1900], view=None)
+    except:
+        pass
+
+
+# ===== БОКСЫ С УДАЧЕЙ =====
+class BoxLuckView(discord.ui.View):
+    """Выбор % удачи при покупке боксов"""
+    def __init__(self, количество: int, user_id: int):
+        super().__init__(timeout=60)
+        self.количество = количество
+        self.user_id = user_id
+        # Базовая кнопка (без удачи)
+        self.add_item(LuckButton(0, количество, user_id, row=0))
+        # 10-40%
+        for pct in [10, 20, 30, 40]:
+            self.add_item(LuckButton(pct, количество, user_id, row=1))
+        # 50-80%
+        for pct in [50, 60, 70, 80]:
+            self.add_item(LuckButton(pct, количество, user_id, row=2))
+        # 90%
+        self.add_item(LuckButton(90, количество, user_id, row=3))
+        self.add_item(CancelBoxButton(row=3))
+
+
+class LuckButton(discord.ui.Button):
+    def __init__(self, luck_pct: int, количество: int, user_id: int, row: int):
+        base_price = количество * 100
+        extra = LUCK_PRICES.get(luck_pct, 0) * количество
+        total = base_price + extra
+        if luck_pct == 0:
+            label = f"🎲 Без удачи ({base_price}🪙)"
+        else:
+            label = f"🍀 {luck_pct}% ({total}🪙)"
+        super().__init__(label=label[:80], style=discord.ButtonStyle.primary if luck_pct > 0 else discord.ButtonStyle.secondary, row=row)
+        self.luck_pct = luck_pct
+        self.количество = количество
+        self.user_id = user_id
+        self.total = total
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Это не твои боксы!", ephemeral=True)
+            return
+        bal = get_balance(interaction.user.id)
+        if bal < self.total:
+            await interaction.response.edit_message(
+                content=f"❌ Нужно **{self.total}**, есть **{bal}**", view=None)
+            return
+        set_balance(interaction.user.id, bal - self.total)
+        результаты = []
+        for _ in range(self.количество):
+            rarity, fighter = roll_fighter(self.luck_pct)
+            f = {**fighter, "rarity": rarity}
+            add_fighter(interaction.user.id, f)
+            результаты.append((rarity, fighter))
+        luck_str = f"🍀 Удача: **{self.luck_pct}%**\n" if self.luck_pct > 0 else ""
+        текст = f"📦 **{self.количество} боксов** за **{self.total}** ликкеров!\n{luck_str}\n"
+        for rarity, fighter in результаты:
+            цвет = RARITY_COLORS.get(rarity, "⬜")
+            if rarity == "Секретный":
+                текст += f"{цвет} **[СЕКРЕТНЫЙ]** {fighter['emoji']} **{fighter['name']}** +{fighter['income']}/час 🤫\n"
+            else:
+                текст += f"{цвет} **[{rarity}]** {fighter['emoji']} **{fighter['name']}** +{fighter['income']}/час\n"
+        new_bal = get_balance(interaction.user.id)
+        текст += f"\n📈 Доход: **{get_hourly_income(interaction.user.id)}**/час\n💰 Остаток: **{new_bal}**"
+        if len(текст) > 1900:
+            текст = текст[:1900] + "..."
         await interaction.response.edit_message(content=текст, view=None)
 
-class CancelBattleButton(discord.ui.Button):
-    def __init__(self):
-        super().__init__(label="❌ Отмена", style=discord.ButtonStyle.danger)
+
+class CancelBoxButton(discord.ui.Button):
+    def __init__(self, row: int):
+        super().__init__(label="❌ Отмена", style=discord.ButtonStyle.danger, row=row)
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.edit_message(content="❌ Бой отменён!", view=None)
+        await interaction.response.edit_message(content="🚫 Отменено!", view=None)
+
 
 # ===== КОМАНДЫ =====
 
@@ -762,13 +1208,13 @@ async def оир(interaction: discord.Interaction, сторона: app_commands.
         return
     результат = random.choice(["орёл", "решка"])
     if сторона.value == результат:
-        new_bal = bal + ставка
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, bal + ставка)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🪙 Выпало **{результат}**!\n🎉 Выиграл **{ставка}** ликкеров!\n💰 Баланс: **{new_bal}**")
     else:
-        new_bal = bal - ставка
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, bal - ставка)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🪙 Выпало **{результат}**!\n😢 Проиграл **{ставка}** ликкеров!\n💰 Баланс: **{new_bal}**")
 
@@ -787,13 +1233,13 @@ async def рул(interaction: discord.Interaction, ставка: int):
         return
     победа = random.choice([True, False])
     if победа:
-        new_bal = bal + ставка
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, bal + ставка)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🎰 ДЖЕКПОТ!\n✅ Выиграл **{ставка}** ликкеров!\n💰 Баланс: **{new_bal}**")
     else:
-        new_bal = bal - ставка
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, bal - ставка)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🎰 Не повезло...\n❌ Проиграл **{ставка}** ликкеров!\n💰 Баланс: **{new_bal}**")
 
@@ -814,8 +1260,8 @@ async def мн(interaction: discord.Interaction, ставка: int):
     множитель = round(random.uniform(1.1, 2.0), 2)
     if победа:
         выигрыш = int(ставка * множитель)
-        new_bal = bal + выигрыш
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, bal + выигрыш)
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🎲 **Множитель:** x{множитель}\n\n"
             f"🎉 ВЫИГРЫШ!\n"
@@ -823,8 +1269,8 @@ async def мн(interaction: discord.Interaction, ставка: int):
             f"💰 Баланс: **{new_bal}**")
     else:
         потеря = int(ставка * множитель)
-        new_bal = max(0, bal - потеря)
-        set_balance(interaction.user.id, new_bal)
+        set_balance(interaction.user.id, max(0, bal - потеря))
+        new_bal = get_balance(interaction.user.id)
         await interaction.response.send_message(
             f"🎲 **Множитель:** x{множитель}\n\n"
             f"💀 ПРОИГРЫШ!\n"
@@ -841,7 +1287,8 @@ async def нак(interaction: discord.Interaction, участник: discord.Mem
         return
     bal = get_balance(участник.id)
     set_balance(участник.id, bal + сумма)
-    await interaction.followup.send(f"✅ {участник.mention} получил **{сумма}** ликкеров\n💰 Баланс: **{bal + сумма}**")
+    new_bal = get_balance(участник.id)
+    await interaction.followup.send(f"✅ {участник.mention} получил **{сумма}** ликкеров\n💰 Баланс: **{new_bal}**")
 
 @tree.command(name="пер", description="Перевести ликкеры")
 @app_commands.describe(участник="Участник", сумма="Сумма")
@@ -859,7 +1306,8 @@ async def пер(interaction: discord.Interaction, участник: discord.Mem
         return
     set_balance(interaction.user.id, bal - сумма)
     set_balance(участник.id, get_balance(участник.id) + сумма)
-    await interaction.followup.send(f"💸 **{interaction.user.name}** → {участник.mention}\n**{сумма}** ликкеров\n💰 Твой баланс: **{bal - сумма}**")
+    new_bal = get_balance(interaction.user.id)
+    await interaction.followup.send(f"💸 **{interaction.user.name}** → {участник.mention}\n**{сумма}** ликкеров\n💰 Твой баланс: **{new_bal}**")
 
 @tree.command(name="отобрать", description="Отобрать ликкеры")
 @app_commands.describe(участник="Участник", сумма="Сумма")
@@ -876,7 +1324,12 @@ async def отобрать(interaction: discord.Interaction, участник: d
     реально = min(сумма, bal)
     set_balance(участник.id, bal - реально)
     set_balance(interaction.user.id, get_balance(interaction.user.id) + реально)
-    await interaction.followup.send(f"💀 У {участник.mention} отобрано **{реально}** ликкеров!\n💰 Тебе: **{реально}**")
+    new_bal_target = get_balance(участник.id)
+    new_bal_self = get_balance(interaction.user.id)
+    await interaction.followup.send(
+        f"💀 У {участник.mention} отобрано **{реально}** ликкеров!\n"
+        f"💰 Баланс {участник.name}: **{new_bal_target}**\n"
+        f"💰 Твой баланс: **{new_bal_self}**")
 
 @tree.command(name="топ", description="Топ 10 по ликкерам")
 async def топ(interaction: discord.Interaction):
@@ -959,36 +1412,28 @@ async def магазин(interaction: discord.Interaction):
         f"🏪 **Магаз**\n💰 **{bal}** ликкеров | 📈 **{income}**/час\n\nЧто хочешь купить?",
         view=ShopMainView(), ephemeral=True)
 
-@tree.command(name="боксы", description="Открыть боксы")
+@tree.command(name="боксы", description="Открыть боксы (выбор удачи)")
 @app_commands.describe(количество="Количество (1 = 100 ликкеров)")
 async def боксы(interaction: discord.Interaction, количество: int):
     await interaction.response.defer()
     if количество <= 0 or количество > 100:
         await interaction.followup.send("❌ От 1 до 100!", ephemeral=True)
         return
-    цена = количество * 100
+    base_price = количество * 100
     bal = get_balance(interaction.user.id)
-    if bal < цена:
-        await interaction.followup.send(f"❌ Нужно **{цена}**, есть **{bal}**", ephemeral=True)
+    if bal < base_price:
+        await interaction.followup.send(f"❌ Нужно минимум **{base_price}**, есть **{bal}**", ephemeral=True)
         return
-    set_balance(interaction.user.id, bal - цена)
-    результаты = []
-    for _ in range(количество):
-        rarity, fighter = roll_fighter()
-        f = {**fighter, "rarity": rarity}
-        add_fighter(interaction.user.id, f)
-        результаты.append((rarity, fighter))
-    текст = f"📦 **{количество} боксов** за **{цена}** ликкеров!\n\n"
-    for rarity, fighter in результаты:
-        цвет = RARITY_COLORS.get(rarity, "⬜")
-        if rarity == "Секретный":
-            текст += f"{цвет} **[СЕКРЕТНЫЙ]** {fighter['emoji']} **{fighter['name']}** +{fighter['income']}/час 🤫\n"
-        else:
-            текст += f"{цвет} **[{rarity}]** {fighter['emoji']} **{fighter['name']}** +{fighter['income']}/час\n"
-    текст += f"\n📈 Доход: **{get_hourly_income(interaction.user.id)}**/час\n💰 Остаток: **{bal - цена}**"
-    if len(текст) > 1900:
-        текст = текст[:1900] + "..."
-    await interaction.followup.send(текст)
+
+    luck_info = "\n".join([
+        f"🍀 **{pct}%** удачи — +{LUCK_PRICES[pct] * количество}🪙 (итого {base_price + LUCK_PRICES[pct] * количество})"
+        for pct in [10, 20, 30, 40, 50, 60, 70, 80, 90]
+    ])
+
+    await interaction.followup.send(
+        f"📦 **Покупка {количество} боксов**\n💰 Базовая цена: **{base_price}** ликкеров\n\n"
+        f"**Выбери уровень удачи:**\n{luck_info}\n\nИли купи без удачи 🎲",
+        view=BoxLuckView(количество, interaction.user.id))
 
 @tree.command(name="бойцы", description="Мои бойцы")
 async def бойцы(interaction: discord.Interaction):
@@ -1037,30 +1482,86 @@ async def колода(interaction: discord.Interaction):
         текст += f"{'⚔️' if deck else '🆕'} **{name}** — {len(deck)}/5 бойцов | Сила: {power}\n"
     await interaction.followup.send(текст, view=DeckMainView(interaction.user.id), ephemeral=True)
 
-@tree.command(name="бой", description="Бой с участником")
-@app_commands.describe(участник="Участник для боя")
-async def бой(interaction: discord.Interaction, участник: discord.Member):
-    await interaction.response.defer(ephemeral=True)
+@tree.command(name="бой", description="Бой с участником на ставку")
+@app_commands.describe(участник="Участник для боя", ставка="Ставка ликкеров")
+async def бой(interaction: discord.Interaction, участник: discord.Member, ставка: int):
+    await interaction.response.defer()
+
     if участник.id == interaction.user.id:
         await interaction.followup.send("❌ Нельзя сражаться с собой!", ephemeral=True)
         return
-    my_f = get_fighters_list(interaction.user.id)
-    if not my_f:
+    if участник.bot:
+        await interaction.followup.send("❌ Нельзя сражаться с ботом!", ephemeral=True)
+        return
+    if ставка <= 0:
+        await interaction.followup.send("❌ Ставка должна быть > 0!", ephemeral=True)
+        return
+
+    ch_bal = get_balance(interaction.user.id)
+    if ch_bal < ставка:
+        await interaction.followup.send(f"❌ Тебе не хватает ликкеров! Нужно **{ставка}**, есть **{ch_bal}**", ephemeral=True)
+        return
+
+    my_fighters = get_fighters_list(interaction.user.id)
+    if not my_fighters:
         await interaction.followup.send("❌ У тебя нет бойцов! Открой `/боксы`", ephemeral=True)
         return
-    opp_deck_name, opp_deck = get_best_deck(участник.id)
-    if not opp_deck:
+
+    my_decks = get_decks(interaction.user.id)
+    has_any_ch = any(my_decks.get(n) for n in ["К1", "К2", "К3", "К4", "К5"])
+    if not has_any_ch:
+        await interaction.followup.send("❌ У тебя нет колод! Создай через `/колода`", ephemeral=True)
+        return
+
+    opp_decks = get_decks(участник.id)
+    has_any_op = any(opp_decks.get(n) for n in ["К1", "К2", "К3", "К4", "К5"])
+    if not has_any_op:
         await interaction.followup.send(f"❌ У **{участник.name}** нет колод! Бой невозможен.", ephemeral=True)
         return
-    my_decks = get_decks(interaction.user.id)
-    has_any = any(my_decks.get(n) for n in ["К1", "К2", "К3", "К4", "К5"])
-    if not has_any:
-        await interaction.followup.send("❌ У тебя нет колод! Создай колоду через `/колода`", ephemeral=True)
-        return
+
     await interaction.followup.send(
-        f"⚔️ **Бой против {участник.name}!**\nВыбери колоду для боя:",
-        view=BattleDeckView(участник), ephemeral=True)
+        f"⚔️ **{interaction.user.name}** вызывает **{участник.mention}** на бой!\n"
+        f"💰 Ставка: **{ставка}** ликкеров каждый\n\n"
+        f"{участник.mention}, принимаешь вызов?",
+        view=BattleInviteView(interaction.user, участник, ставка, interaction.channel))
+
+@tree.command(name="команды", description="Список всех команд")
+async def команды(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    текст = (
+        "📋 **Все команды бота:**\n\n"
+        "**💰 Экономика:**\n"
+        "`/баланс` — посмотреть баланс (своё или чужое)\n"
+        "`/пер [участник] [сумма]` — перевести ликкеры\n"
+        "`/топ` — топ 10 богатейших\n\n"
+        "**🎰 Казино** *(только в #казик)*:\n"
+        "`/оир [сторона] [ставка]` — орёл или решка\n"
+        "`/рул [ставка]` — рулетка (50/50)\n"
+        "`/мн [ставка]` — множитель x1.1–2.0\n\n"
+        "**📦 Бойцы:**\n"
+        "`/боксы [кол-во]` — открыть боксы (выбор удачи 0–90%)\n"
+        "`/бойцы` — мои бойцы\n"
+        "`/всебойцы` — все возможные бойцы\n"
+        "`/колода` — управление колодами (К1–К5)\n\n"
+        "**⚔️ Бой:**\n"
+        "`/бой [участник] [ставка]` — вызов на бой\n"
+        "  • Противник принимает/отклоняет\n"
+        "  • Оба выбирают колоду\n"
+        "  • Каждый раунд — задачка для буста x1.5–2.0\n"
+        "  • Победитель забирает ставки обоих\n\n"
+        "**🏪 Магазин:**\n"
+        "`/магазин` — купить роли за ликкеры\n\n"
+        "**🛠️ Админ:**\n"
+        "`/нак [участник] [сумма]` — накрутить баланс\n"
+        "`/отобрать [участник] [сумма]` — отобрать ликкеры\n"
+        "`/датьвсем [сумма]` — выдать всем\n"
+        "`/сброс` — сбросить все балансы\n"
+        "`/сбросдохода` — сбросить всех бойцов\n"
+        "`/fake_ban [участник]` — тайм-аут 67 сек\n"
+        "`/отправить [участник] [страна]` — отправить в страну\n"
+        "`/ip [участник]` — пробив IP (шутка)\n"
+    )
+    await interaction.followup.send(текст, ephemeral=True)
 
 threading.Thread(target=run_web, daemon=True).start()
 client.run(DISCORD_TOKEN)
-
