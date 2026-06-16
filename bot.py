@@ -133,81 +133,109 @@ LUCK_PRICES = {
 
 # ===== ЗАДАЧКИ ДЛЯ БОЯ =====
 QUIZ_QUESTIONS = [
-    {
-        "question": "🧮 Сколько будет 17 × 13?",
-        "options": ["211", "221", "231", "241"],
-        "answer": 1,
-    },
-    {
-        "question": "🧮 Корень из 289?",
-        "options": ["15", "16", "17", "18"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 256 ÷ 8?",
-        "options": ["28", "30", "32", "34"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 15² + 8² = ?",
-        "options": ["269", "279", "289", "299"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 3⁷?",
-        "options": ["2187", "2197", "2207", "2217"],
-        "answer": 0,
-    },
-    {
-        "question": "🧮 Сколько будет 144 × 7?",
-        "options": ["988", "998", "1008", "1018"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 log₂(512) = ?",
-        "options": ["7", "8", "9", "10"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 19 × 19?",
-        "options": ["341", "351", "361", "371"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 1000 - 387?",
-        "options": ["603", "613", "623", "633"],
-        "answer": 1,
-    },
-    {
-        "question": "🧮 Факториал 6 (6!) = ?",
-        "options": ["620", "700", "720", "740"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 48 × 25?",
-        "options": ["1100", "1150", "1200", "1250"],
-        "answer": 2,
-    },
-    {
-        "question": "🧮 Сколько будет 2^10?",
-        "options": ["512", "1024", "2048", "256"],
-        "answer": 1,
-    },
-    {
-        "question": "🧮 Сколько будет 37 × 43?",
-        "options": ["1581", "1591", "1601", "1611"],
-        "answer": 1,
-    },
-    {
-        "question": "🧮 Сколько будет 999 × 9?",
-        "options": ["8981", "8991", "9001", "9011"],
-        "answer": 1,
-    },
-    {
-        "question": "🧮 Корень из 1764?",
-        "options": ["40", "42", "44", "46"],
-        "answer": 1,
-    },
+    # === МАТЕМАТИКА ===
+    {"question": "🧮 Сколько будет 17 × 13?", "options": ["201", "221", "231", "211"], "answer": 1},
+    {"question": "🧮 Сколько будет 256 ÷ 8?", "options": ["28", "30", "32", "34"], "answer": 2},
+    {"question": "🧮 Сколько будет 19 × 19?", "options": ["341", "351", "361", "371"], "answer": 2},
+    {"question": "🧮 Сколько будет 1000 − 387?", "options": ["603", "613", "623", "633"], "answer": 1},
+    {"question": "🧮 Сколько будет 48 × 25?", "options": ["1100", "1150", "1200", "1250"], "answer": 2},
+    {"question": "🧮 Сколько будет 144 ÷ 12?", "options": ["10", "11", "12", "13"], "answer": 2},
+    {"question": "🧮 Сколько будет 23 × 4?", "options": ["82", "88", "92", "96"], "answer": 2},
+    {"question": "🧮 Сколько будет 15 × 15?", "options": ["205", "215", "225", "235"], "answer": 2},
+    {"question": "🧮 Сколько будет 360 ÷ 9?", "options": ["36", "38", "40", "42"], "answer": 2},
+    {"question": "🧮 Сколько будет 7 × 8 × 3?", "options": ["156", "162", "168", "174"], "answer": 2},
+    {"question": "🧮 Сколько будет 450 − 178?", "options": ["262", "272", "282", "292"], "answer": 1},
+    {"question": "🧮 Сколько будет 36 × 5?", "options": ["160", "170", "180", "190"], "answer": 2},
+    {"question": "🧮 Сколько будет 84 ÷ 7?", "options": ["10", "11", "12", "13"], "answer": 2},
+    {"question": "🧮 Сколько будет 13 × 11?", "options": ["133", "143", "153", "163"], "answer": 1},
+    {"question": "🧮 Сколько будет 500 − 263?", "options": ["227", "237", "247", "257"], "answer": 1},
+    {"question": "🧮 Сколько будет 25 × 12?", "options": ["280", "290", "300", "310"], "answer": 2},
+    {"question": "🧮 Сколько будет 63 ÷ 9 × 7?", "options": ["43", "47", "49", "53"], "answer": 2},
+    {"question": "🧮 Сколько будет 18 × 6?", "options": ["98", "108", "118", "128"], "answer": 1},
+    {"question": "🧮 Сколько будет 720 ÷ 8?", "options": ["80", "85", "90", "95"], "answer": 2},
+    {"question": "🧮 Сколько будет 34 × 3?", "options": ["92", "96", "100", "102"], "answer": 3},
+    {"question": "🧮 Сколько будет 11 × 11 × 2?", "options": ["222", "232", "242", "252"], "answer": 2},
+    {"question": "🧮 Сколько будет 96 ÷ 6?", "options": ["14", "15", "16", "17"], "answer": 2},
+    {"question": "🧮 Сколько будет 45 × 8?", "options": ["340", "350", "360", "370"], "answer": 2},
+    {"question": "🧮 Сколько будет 1000 ÷ 25?", "options": ["30", "35", "40", "45"], "answer": 2},
+    {"question": "🧮 Сколько будет 56 + 78?", "options": ["124", "130", "134", "136"], "answer": 2},
+    {"question": "🧮 Сколько будет 9 × 9 − 1?", "options": ["78", "80", "82", "84"], "answer": 1},
+    {"question": "🧮 Сколько будет 125 × 8?", "options": ["900", "950", "1000", "1050"], "answer": 2},
+    {"question": "🧮 Сколько будет 14 × 14?", "options": ["176", "186", "196", "206"], "answer": 2},
+    {"question": "🧮 Сколько будет 300 − 144?", "options": ["146", "154", "156", "166"], "answer": 2},
+    {"question": "🧮 Сколько будет 72 ÷ 8 + 15?", "options": ["22", "24", "26", "28"], "answer": 1},
+
+    # === ДРОБИ И ПРОЦЕНТЫ ===
+    {"question": "🧮 Сколько будет 1/2 от 80?", "options": ["30", "35", "40", "45"], "answer": 2},
+    {"question": "🧮 Сколько будет 1/4 от 120?", "options": ["25", "30", "35", "40"], "answer": 1},
+    {"question": "🧮 Сколько будет 3/4 от 100?", "options": ["65", "70", "75", "80"], "answer": 2},
+    {"question": "🧮 10% от 250 — это сколько?", "options": ["20", "25", "30", "35"], "answer": 1},
+    {"question": "🧮 20% от 60 — это сколько?", "options": ["10", "12", "14", "16"], "answer": 1},
+    {"question": "🧮 50% от 84 — это сколько?", "options": ["38", "40", "42", "44"], "answer": 2},
+    {"question": "🧮 25% от 200 — это сколько?", "options": ["40", "45", "50", "55"], "answer": 2},
+    {"question": "🧮 Сколько будет 2/5 от 50?", "options": ["15", "18", "20", "22"], "answer": 2},
+    {"question": "🧮 Сколько будет 3/5 от 60?", "options": ["30", "34", "36", "38"], "answer": 2},
+    {"question": "🧮 30% от 90 — это сколько?", "options": ["21", "24", "27", "30"], "answer": 2},
+
+    # === СТЕПЕНИ И КВАДРАТЫ ===
+    {"question": "🧮 Сколько будет 2⁸?", "options": ["128", "256", "512", "64"], "answer": 1},
+    {"question": "🧮 Сколько будет 3⁴?", "options": ["71", "79", "81", "83"], "answer": 2},
+    {"question": "🧮 Сколько будет 5³?", "options": ["105", "115", "125", "135"], "answer": 2},
+    {"question": "🧮 Квадратный корень из 144?", "options": ["10", "11", "12", "13"], "answer": 2},
+    {"question": "🧮 Квадратный корень из 225?", "options": ["13", "14", "15", "16"], "answer": 2},
+    {"question": "🧮 Сколько будет 4³?", "options": ["54", "60", "64", "68"], "answer": 2},
+    {"question": "🧮 Квадратный корень из 196?", "options": ["12", "13", "14", "15"], "answer": 2},
+    {"question": "🧮 Сколько будет 6²?", "options": ["32", "34", "36", "38"], "answer": 2},
+    {"question": "🧮 Сколько будет 12²?", "options": ["134", "140", "144", "148"], "answer": 2},
+    {"question": "🧮 Сколько будет 2⁶?", "options": ["54", "60", "64", "68"], "answer": 2},
+
+    # === ГЕОМЕТРИЯ ===
+    {"question": "📐 Периметр квадрата со стороной 7 см?", "options": ["21", "24", "28", "32"], "answer": 2},
+    {"question": "📐 Площадь прямоугольника 6×9?", "options": ["48", "50", "54", "56"], "answer": 2},
+    {"question": "📐 Сколько градусов в прямом угле?", "options": ["45", "60", "90", "180"], "answer": 2},
+    {"question": "📐 Сумма углов треугольника?", "options": ["90°", "120°", "180°", "360°"], "answer": 2},
+    {"question": "📐 Площадь квадрата со стороной 8?", "options": ["56", "60", "64", "68"], "answer": 2},
+    {"question": "📐 Периметр прямоугольника 5×10?", "options": ["25", "28", "30", "32"], "answer": 2},
+    {"question": "📐 Сколько сторон у шестиугольника?", "options": ["4", "5", "6", "7"], "answer": 2},
+    {"question": "📐 Диагональ делит прямоугольник на сколько треугольников?", "options": ["1", "2", "3", "4"], "answer": 1},
+    {"question": "📐 Площадь треугольника с основанием 10 и высотой 6?", "options": ["25", "28", "30", "32"], "answer": 2},
+    {"question": "📐 Сколько градусов в развёрнутом угле?", "options": ["90", "120", "180", "270"], "answer": 2},
+
+    # === ЗАДАЧИ НА ЛОГИКУ И СКОРОСТЬ ===
+    {"question": "🚂 Поезд едет 60 км/ч. За 3 часа проедет сколько км?", "options": ["150", "170", "180", "200"], "answer": 2},
+    {"question": "🚶 Пешеход идёт 5 км/ч. За 4 часа пройдёт сколько км?", "options": ["15", "18", "20", "25"], "answer": 2},
+    {"question": "🚗 Машина едет 90 км/ч. 270 км проедет за сколько часов?", "options": ["2", "3", "4", "5"], "answer": 1},
+    {"question": "⏱️ В 1 часе минут — сколько в 3.5 часах?", "options": ["180", "200", "210", "220"], "answer": 2},
+    {"question": "📦 Коробка вмещает 12 яблок. 9 коробок — сколько яблок?", "options": ["96", "104", "108", "112"], "answer": 2},
+    {"question": "🍕 Пиццу делят на 8 кусков. Съели 3/8 — сколько кусков осталось?", "options": ["3", "4", "5", "6"], "answer": 2},
+    {"question": "💰 Купил за 350 р, дал 500 р. Сдача?", "options": ["130", "140", "150", "160"], "answer": 2},
+    {"question": "📚 В классе 30 учеников, 2/5 — мальчики. Сколько мальчиков?", "options": ["10", "12", "14", "16"], "answer": 1},
+    {"question": "🍎 Купили 5 кг яблок по 40 р/кг. Итого?", "options": ["160", "180", "200", "220"], "answer": 2},
+    {"question": "🐄 На ферме 7 коров, каждая даёт 12 л молока. Итого литров?", "options": ["74", "80", "84", "90"], "answer": 2},
+
+    # === ЧИСЛА И ДЕЛИТЕЛИ ===
+    {"question": "🔢 Наименьшее общее кратное 4 и 6?", "options": ["8", "10", "12", "14"], "answer": 2},
+    {"question": "🔢 НОД числа 12 и 18?", "options": ["3", "4", "6", "9"], "answer": 2},
+    {"question": "🔢 Какое число делится и на 3, и на 4?", "options": ["8", "9", "12", "14"], "answer": 2},
+    {"question": "🔢 Простое число из списка?", "options": ["21", "27", "29", "33"], "answer": 2},
+    {"question": "🔢 Сколько делителей у числа 12?", "options": ["4", "5", "6", "7"], "answer": 2},
+    {"question": "🔢 На что делится число 1125?", "options": ["Только на 3", "На 3 и 5", "На 3, 5 и 9", "На 5 и 7"], "answer": 2},
+    {"question": "🔢 Следующее простое число после 13?", "options": ["14", "15", "16", "17"], "answer": 3},
+    {"question": "🔢 Сколько чётных чисел от 1 до 20?", "options": ["8", "9", "10", "11"], "answer": 2},
+    {"question": "🔢 Чему равно НОК(5, 7)?", "options": ["12", "25", "35", "70"], "answer": 2},
+    {"question": "🔢 Какое из чисел делится на 9?", "options": ["124", "135", "146", "157"], "answer": 1},
+
+    # === УРАВНЕНИЯ ===
+    {"question": "✏️ x + 17 = 50. Чему равен x?", "options": ["23", "28", "33", "37"], "answer": 2},
+    {"question": "✏️ 3x = 72. Чему равен x?", "options": ["20", "22", "24", "26"], "answer": 2},
+    {"question": "✏️ x − 14 = 29. Чему равен x?", "options": ["39", "41", "43", "45"], "answer": 2},
+    {"question": "✏️ 5x + 3 = 28. Чему равен x?", "options": ["3", "4", "5", "6"], "answer": 2},
+    {"question": "✏️ 2x − 6 = 18. Чему равен x?", "options": ["10", "11", "12", "13"], "answer": 2},
+    {"question": "✏️ x ÷ 4 = 13. Чему равен x?", "options": ["48", "50", "52", "54"], "answer": 2},
+    {"question": "✏️ 7x = 63. Чему равен x?", "options": ["7", "8", "9", "10"], "answer": 2},
+    {"question": "✏️ 4x − 8 = 20. Чему равен x?", "options": ["5", "6", "7", "8"], "answer": 2},
+    {"question": "✏️ x/3 + 5 = 14. Чему равен x?", "options": ["21", "24", "27", "30"], "answer": 2},
+    {"question": "✏️ 6x + 6 = 42. Чему равен x?", "options": ["4", "5", "6", "7"], "answer": 2},
 ]
 
 # Активные бои: {(user1_id, user2_id): данные}
@@ -760,20 +788,20 @@ class BattleInviteView(discord.ui.View):
         if interaction.user.id != self.opponent.id:
             await interaction.response.send_message("❌ Это не твой вызов!", ephemeral=True)
             return
-        # Проверяем балансы
+        # Проверяем балансы (только если ставка > 0)
         ch_bal = get_balance(self.challenger.id)
         op_bal = get_balance(self.opponent.id)
-        if ch_bal < self.bet:
-            await interaction.response.edit_message(
-                content=f"❌ У **{self.challenger.name}** не хватает ликкеров для ставки!", view=None)
-            return
-        if op_bal < self.bet:
-            await interaction.response.edit_message(
-                content=f"❌ У тебя не хватает ликкеров! Нужно **{self.bet}**", view=None)
-            return
-        # Снимаем ставки
-        set_balance(self.challenger.id, ch_bal - self.bet)
-        set_balance(self.opponent.id, op_bal - self.bet)
+        if self.bet > 0:
+            if ch_bal < self.bet:
+                await interaction.response.edit_message(
+                    content=f"❌ У **{self.challenger.name}** не хватает ликкеров для ставки!", view=None)
+                return
+            if op_bal < self.bet:
+                await interaction.response.edit_message(
+                    content=f"❌ У тебя не хватает ликкеров! Нужно **{self.bet}**", view=None)
+                return
+            set_balance(self.challenger.id, ch_bal - self.bet)
+            set_balance(self.opponent.id, op_bal - self.bet)
         await interaction.response.edit_message(
             content=f"⚔️ **{self.challenger.name}** vs **{self.opponent.name}**\n💰 Ставка: **{self.bet}** ликкеров каждый\n\n{self.challenger.mention}, выбери колоду для боя:",
             view=BattleDeckSelectView(self.challenger, self.opponent, self.bet, self.channel, phase="challenger"))
@@ -918,9 +946,8 @@ class QuizAnswerButton(discord.ui.Button):
 
 async def run_battle(message, channel, challenger: discord.Member, opponent: discord.Member,
                      bet: int, ch_deck: list, ch_deck_name: str, op_deck: list, op_deck_name: str):
-    """Основная логика боя с раундами, задачками и анимацией"""
+    """Бой с пошаговой анимацией — каждая атака редактирует сообщение каждые 2 сек"""
 
-    # Копируем бойцов с HP
     def make_hp(deck):
         fighters = []
         for f in deck:
@@ -928,128 +955,213 @@ async def run_battle(message, channel, challenger: discord.Member, opponent: dis
             fighters.append({**f, "hp": hp, "max_hp": hp})
         return fighters
 
+    def hp_bar(hp, max_hp):
+        pct = hp / max_hp
+        filled = int(pct * 8)
+        bar = "█" * filled + "░" * (8 - filled)
+        return f"[{bar}] {hp}/{max_hp}"
+
+    def side_status(fighters, name):
+        if not fighters:
+            return f"**{name}:** 💀 все выбыли"
+        lines = []
+        for f in fighters:
+            lines.append(f"  {f['emoji']} **{f['name']}** {hp_bar(f['hp'], f['max_hp'])}")
+        return f"**{name}:**\n" + "\n".join(lines)
+
     ch_fighters = make_hp(ch_deck)
     op_fighters = make_hp(op_deck)
-
     round_num = 0
-    battle_log = []
 
     while ch_fighters and op_fighters:
         round_num += 1
 
-        # Задачка перед раундом
+        # === ЗАДАЧКА ===
         q = random.choice(QUIZ_QUESTIONS)
         quiz_view = QuizView(q, challenger.id, opponent.id)
-
         quiz_text = (
-            f"⚔️ **Раунд {round_num}**\n\n"
-            f"🧮 **ЗАДАЧА (15 сек):** {q['question']}\n"
-            f"Правильный ответ даст буст x1.5–2.0 твоим бойцам!\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"⚔️ **РАУНД {round_num}** начинается!\n"
+            f"━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"🧮 **ЗАДАЧА (15 сек):**\n{q['question']}\n\n"
+            f"✅ Правильный ответ = буст **x1.5–2.0** твоим бойцам!\n\n"
+            f"{side_status(ch_fighters, challenger.name)}\n\n"
+            f"{side_status(op_fighters, opponent.name)}"
         )
         try:
-            await message.edit(content=quiz_text, view=quiz_view)
+            await message.edit(content=quiz_text[:1900], view=quiz_view)
         except:
             pass
-
         await asyncio.sleep(15)
         quiz_view.stop()
 
-        # Определяем буст
         ch_boost = round(random.uniform(1.5, 2.0), 2) if quiz_view.get_boost(challenger.id) else 1.0
         op_boost = round(random.uniform(1.5, 2.0), 2) if quiz_view.get_boost(opponent.id) else 1.0
 
-        boost_text = ""
+        # === АНИМАЦИЯ БОЯ ===
+        # Формируем очередь атак: перемешиваем бойцов обеих сторон
+        # Каждый боец атакует случайного живого врага — показываем по одной атаке
+
+        # Собираем все атаки раунда заранее (чтобы не было проблем с мёртвыми)
+        attacks = []
+        ch_alive = list(ch_fighters)
+        op_alive = list(op_fighters)
+
+        # Перемешиваем порядок атак (случайный боец любой стороны)
+        all_attackers = [(f, "ch") for f in ch_alive] + [(f, "op") for f in op_alive]
+        random.shuffle(all_attackers)
+
+        temp_ch = {f["name"]: f for f in ch_fighters}
+        temp_op = {f["name"]: f for f in op_fighters}
+
+        for attacker_orig, side in all_attackers:
+            if side == "ch":
+                # Атакует боец challenger
+                a = temp_ch.get(attacker_orig["name"])
+                if not a:
+                    continue
+                alive_enemies = [f for f in temp_op.values() if f["hp"] > 0]
+                if not alive_enemies:
+                    break
+                target = random.choice(alive_enemies)
+                raw_dmg = max(1, int(a["atk"] * ch_boost) - target["def"] // 3)
+                dmg = max(1, raw_dmg + random.randint(-3, 5))
+                died = (target["hp"] - dmg) <= 0
+                attacks.append({
+                    "side": "ch",
+                    "atk_emoji": a["emoji"], "atk_name": a["name"],
+                    "def_emoji": target["emoji"], "def_name": target["name"],
+                    "dmg": dmg, "died": died,
+                    "boost": ch_boost,
+                    "target_name": target["name"],
+                    "hp_before": target["hp"],
+                    "hp_after": max(0, target["hp"] - dmg),
+                    "hp_max": target["max_hp"],
+                })
+                target["hp"] = max(0, target["hp"] - dmg)
+                if target["hp"] <= 0:
+                    del temp_op[target["name"]]
+            else:
+                # Атакует боец opponent
+                a = temp_op.get(attacker_orig["name"])
+                if not a:
+                    continue
+                alive_enemies = [f for f in temp_ch.values() if f["hp"] > 0]
+                if not alive_enemies:
+                    break
+                target = random.choice(alive_enemies)
+                raw_dmg = max(1, int(a["atk"] * op_boost) - target["def"] // 3)
+                dmg = max(1, raw_dmg + random.randint(-3, 5))
+                died = (target["hp"] - dmg) <= 0
+                attacks.append({
+                    "side": "op",
+                    "atk_emoji": a["emoji"], "atk_name": a["name"],
+                    "def_emoji": target["emoji"], "def_name": target["name"],
+                    "dmg": dmg, "died": died,
+                    "target_name": target["name"],
+                    "hp_before": target["hp"],
+                    "hp_after": max(0, target["hp"] - dmg),
+                    "hp_max": target["max_hp"],
+                    "boost": op_boost,
+                })
+                target["hp"] = max(0, target["hp"] - dmg)
+                if target["hp"] <= 0:
+                    del temp_ch[target["name"]]
+
+        # Применяем итоговые HP к реальным спискам
+        for f in ch_fighters:
+            if f["name"] in temp_ch:
+                f["hp"] = temp_ch[f["name"]]["hp"]
+            else:
+                f["hp"] = 0
+        for f in op_fighters:
+            if f["name"] in temp_op:
+                f["hp"] = temp_op[f["name"]]["hp"]
+            else:
+                f["hp"] = 0
+
+        ch_fighters = [f for f in ch_fighters if f["hp"] > 0]
+        op_fighters = [f for f in op_fighters if f["hp"] > 0]
+
+        # Показываем атаки одну за одной с паузой 2 сек
+        shown_lines = []
+        header = f"━━━━━━━━━━━━━━━━━━━━━\n⚔️ **РАУНД {round_num}**"
         if ch_boost > 1.0:
-            boost_text += f"⚡ **{challenger.name}** ответил правильно! Буст x{ch_boost}!\n"
+            header += f"\n⚡ {challenger.name} буст x{ch_boost}!"
         if op_boost > 1.0:
-            boost_text += f"⚡ **{opponent.name}** ответил правильно! Буст x{op_boost}!\n"
+            header += f"\n⚡ {opponent.name} буст x{op_boost}!"
+        header += "\n━━━━━━━━━━━━━━━━━━━━━\n"
 
-        # Проводим раунд
-        round_text = f"⚔️ **Раунд {round_num}:**\n"
-        if boost_text:
-            round_text += boost_text + "\n"
+        for atk in attacks:
+            side_arrow = "🔴" if atk["side"] == "ch" else "🔵"
+            boost_tag = f" ⚡x{atk['boost']}" if atk["boost"] > 1.0 else ""
+            line = (
+                f"{side_arrow} {atk['atk_emoji']} **{atk['atk_name']}**{boost_tag} "
+                f"⟶ {atk['def_emoji']} **{atk['def_name']}** "
+                f"[-**{atk['dmg']}** HP] ({atk['hp_after']}/{atk['hp_max']})"
+            )
+            if atk["died"]:
+                line += f"\n   💀 **{atk['def_emoji']} {atk['def_name']} выбыл!**"
+            shown_lines.append(line)
 
-        # Каждый живой боец атакует случайного врага
-        round_events = []
+            display = header + "\n".join(shown_lines[-12:])  # последние 12 строк
+            try:
+                await message.edit(content=display[:1900], view=None)
+            except:
+                pass
+            await asyncio.sleep(2)
 
-        # Атаки со стороны challenger
-        for attacker in list(ch_fighters):
-            if not op_fighters:
-                break
-            target = random.choice(op_fighters)
-            raw_dmg = max(1, int(attacker["atk"] * ch_boost) - target["def"] // 3)
-            dmg = max(1, raw_dmg + random.randint(-3, 5))
-            target["hp"] -= dmg
-            round_events.append(f"🔥 **{attacker['emoji']} {attacker['name']}** атакует → **{target['emoji']} {target['name']}** (-{dmg} HP)")
-            if target["hp"] <= 0:
-                round_events.append(f"💀 **{target['emoji']} {target['name']}** выбыл!")
-                op_fighters.remove(target)
-
-        # Атаки со стороны opponent
-        for attacker in list(op_fighters):
-            if not ch_fighters:
-                break
-            target = random.choice(ch_fighters)
-            raw_dmg = max(1, int(attacker["atk"] * op_boost) - target["def"] // 3)
-            dmg = max(1, raw_dmg + random.randint(-3, 5))
-            target["hp"] -= dmg
-            round_events.append(f"🗡️ **{attacker['emoji']} {attacker['name']}** атакует → **{target['emoji']} {target['name']}** (-{dmg} HP)")
-            if target["hp"] <= 0:
-                round_events.append(f"💀 **{target['emoji']} {target['name']}** выбыл!")
-                ch_fighters.remove(target)
-
-        round_text += "\n".join(round_events)
-
-        # Статус HP
-        round_text += f"\n\n**🩸 HP после раунда:**\n"
-        round_text += f"**{challenger.name}:** " + " | ".join([f"{f['emoji']}{f['hp']}" for f in ch_fighters]) if ch_fighters else f"**{challenger.name}:** —"
-        round_text += "\n"
-        round_text += f"**{opponent.name}:** " + " | ".join([f"{f['emoji']}{f['hp']}" for f in op_fighters]) if op_fighters else f"**{opponent.name}:** —"
-
-        battle_log.append(round_text)
-
+        # Итог раунда — показываем финальный статус HP
+        status_text = (
+            header
+            + "\n".join(shown_lines[-8:])
+            + f"\n\n{'─'*21}\n"
+            + f"{side_status(ch_fighters, challenger.name)}\n\n"
+            + f"{side_status(op_fighters, opponent.name)}"
+        )
         try:
-            await message.edit(content=round_text[:1900], view=None)
+            await message.edit(content=status_text[:1900], view=None)
         except:
             pass
 
         if not ch_fighters or not op_fighters:
             break
 
-        # Пауза между раундами
-        await asyncio.sleep(random.randint(5, 10))
+        await asyncio.sleep(4)
 
-    # Итог
+    # === ИТОГ ===
     if ch_fighters and not op_fighters:
-        winner = challenger
-        loser = opponent
+        winner, loser = challenger, opponent
     elif op_fighters and not ch_fighters:
-        winner = opponent
-        loser = challenger
+        winner, loser = opponent, challenger
     else:
-        # Ничья (оба пали)
-        set_balance(challenger.id, get_balance(challenger.id) + bet)
-        set_balance(opponent.id, get_balance(opponent.id) + bet)
+        # Ничья
+        if bet > 0:
+            set_balance(challenger.id, get_balance(challenger.id) + bet)
+            set_balance(opponent.id, get_balance(opponent.id) + bet)
+            draw_text = f"⚔️ **НИЧЬЯ!**\n\nОба потеряли всех бойцов одновременно!\n💰 Ставки возвращены: по **{bet}** ликкеров"
+        else:
+            draw_text = "⚔️ **НИЧЬЯ!**\n\nОба потеряли всех бойцов одновременно!"
         try:
-            await message.edit(
-                content=f"⚔️ **НИЧЬЯ!**\n\nОба потеряли всех бойцов одновременно!\n💰 Ставки возвращены: по **{bet}** ликкеров",
-                view=None)
+            await message.edit(content=draw_text, view=None)
         except:
             pass
         return
 
-    prize = bet * 2
-    set_balance(winner.id, get_balance(winner.id) + prize)
-    w_bal = get_balance(winner.id)
-    l_bal = get_balance(loser.id)
+    if bet > 0:
+        prize = bet * 2
+        set_balance(winner.id, get_balance(winner.id) + prize)
+        prize_text = f"💰 {winner.mention} забирает **{prize}** ликкеров!\n📊 Баланс {winner.name}: **{get_balance(winner.id)}**\n📊 Баланс {loser.name}: **{get_balance(loser.id)}**"
+    else:
+        prize_text = "🎮 Бой был товарищеским — без ставок!"
 
     result_text = (
-        f"🏆 **БОЙ ЗАВЕРШЁН!**\n\n"
-        f"🥇 **ПОБЕДИТЕЛЬ: {winner.name}**! 🎉\n"
+        f"━━━━━━━━━━━━━━━━━━━━━\n"
+        f"🏆 **БОЙ ЗАВЕРШЁН!** (Раунд {round_num})\n"
+        f"━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🥇 **ПОБЕДИТЕЛЬ: {winner.name}** 🎉\n"
         f"💀 Проиграл: {loser.name}\n\n"
-        f"💰 {winner.mention} забирает **{prize}** ликкеров!\n"
-        f"📊 Баланс {winner.name}: **{w_bal}**\n"
-        f"📊 Баланс {loser.name}: **{l_bal}**"
+        f"{prize_text}"
     )
     try:
         await message.edit(content=result_text[:1900], view=None)
@@ -1493,12 +1605,12 @@ async def бой(interaction: discord.Interaction, участник: discord.Mem
     if участник.bot:
         await interaction.followup.send("❌ Нельзя сражаться с ботом!", ephemeral=True)
         return
-    if ставка <= 0:
-        await interaction.followup.send("❌ Ставка должна быть > 0!", ephemeral=True)
+    if ставка < 0:
+        await interaction.followup.send("❌ Ставка не может быть отрицательной!", ephemeral=True)
         return
 
     ch_bal = get_balance(interaction.user.id)
-    if ch_bal < ставка:
+    if ставка > 0 and ch_bal < ставка:
         await interaction.followup.send(f"❌ Тебе не хватает ликкеров! Нужно **{ставка}**, есть **{ch_bal}**", ephemeral=True)
         return
 
@@ -1519,49 +1631,555 @@ async def бой(interaction: discord.Interaction, участник: discord.Mem
         await interaction.followup.send(f"❌ У **{участник.name}** нет колод! Бой невозможен.", ephemeral=True)
         return
 
+    ставка_текст = f"💰 Ставка: **{ставка}** ликкеров каждый" if ставка > 0 else "🎮 Товарищеский бой (без ставки)"
     await interaction.followup.send(
         f"⚔️ **{interaction.user.name}** вызывает **{участник.mention}** на бой!\n"
-        f"💰 Ставка: **{ставка}** ликкеров каждый\n\n"
+        f"{ставка_текст}\n\n"
         f"{участник.mention}, принимаешь вызов?",
         view=BattleInviteView(interaction.user, участник, ставка, interaction.channel))
 
-@tree.command(name="команды", description="Список всех команд")
-async def команды(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=True)
-    текст = (
-        "📋 **Все команды бота:**\n\n"
-        "**💰 Экономика:**\n"
-        "`/баланс` — посмотреть баланс (своё или чужое)\n"
-        "`/пер [участник] [сумма]` — перевести ликкеры\n"
-        "`/топ` — топ 10 богатейших\n\n"
-        "**🎰 Казино** *(только в #казик)*:\n"
-        "`/оир [сторона] [ставка]` — орёл или решка\n"
-        "`/рул [ставка]` — рулетка (50/50)\n"
-        "`/мн [ставка]` — множитель x1.1–2.0\n\n"
-        "**📦 Бойцы:**\n"
-        "`/боксы [кол-во]` — открыть боксы (выбор удачи 0–90%)\n"
-        "`/бойцы` — мои бойцы\n"
-        "`/всебойцы` — все возможные бойцы\n"
-        "`/колода` — управление колодами (К1–К5)\n\n"
-        "**⚔️ Бой:**\n"
-        "`/бой [участник] [ставка]` — вызов на бой\n"
-        "  • Противник принимает/отклоняет\n"
-        "  • Оба выбирают колоду\n"
-        "  • Каждый раунд — задачка для буста x1.5–2.0\n"
-        "  • Победитель забирает ставки обоих\n\n"
-        "**🏪 Магазин:**\n"
-        "`/магазин` — купить роли за ликкеры\n\n"
-        "**🛠️ Админ:**\n"
-        "`/нак [участник] [сумма]` — накрутить баланс\n"
-        "`/отобрать [участник] [сумма]` — отобрать ликкеры\n"
-        "`/датьвсем [сумма]` — выдать всем\n"
-        "`/сброс` — сбросить все балансы\n"
-        "`/сбросдохода` — сбросить всех бойцов\n"
-        "`/fake_ban [участник]` — тайм-аут 67 сек\n"
-        "`/отправить [участник] [страна]` — отправить в страну\n"
-        "`/ip [участник]` — пробив IP (шутка)\n"
-    )
-    await interaction.followup.send(текст, ephemeral=True)
+# =============================================
+# ============= СИСТЕМА МАФИИ ================
+# =============================================
 
-threading.Thread(target=run_web, daemon=True).start()
-client.run(DISCORD_TOKEN)
+MAFIA_ROLES = {
+    "🔫 Дон Мафии":     {"team": "mafia",    "desc": "Убиваешь ночью. 1 раз можешь отмазать игрока от голосования."},
+    "🕵️ Мафиози":       {"team": "mafia",    "desc": "Убиваешь ночью вместе с Доном."},
+    "👨‍⚕️ Доктор":        {"team": "town",     "desc": "Каждую ночь лечишь одного игрока. Себя нельзя 2 ночи подряд."},
+    "🔍 Шериф":         {"team": "town",     "desc": "Каждую ночь проверяешь игрока — мафия или нет."},
+    "👁️ Детектив":      {"team": "town",     "desc": "Раз в 2 ночи узнаёшь точную роль игрока."},
+    "💰 Коррупционер":  {"team": "town",     "desc": "1 раз за игру можешь сменить чужой голос на нужного тебе."},
+    "💣 Маньяк":        {"team": "maniac",   "desc": "Победишь если останешься последним живым."},
+    "🃏 Шут":           {"team": "jester",   "desc": "Победишь если тебя линчуют днём голосованием."},
+    "👤 Мирный":        {"team": "town",     "desc": "Обычный житель. Найди мафию голосованием!"},
+}
+
+def get_role_team(role): return MAFIA_ROLES.get(role, {}).get("team", "town")
+
+def assign_roles(count):
+    roles = []
+    if count <= 6:
+        roles = ["🔫 Дон Мафии", "👨‍⚕️ Доктор", "🔍 Шериф"]
+        roles += ["👤 Мирный"] * (count - 3)
+    elif count <= 9:
+        roles = ["🔫 Дон Мафии", "🕵️ Мафиози", "👨‍⚕️ Доктор", "🔍 Шериф", "👁️ Детектив"]
+        roles += ["👤 Мирный"] * (count - 5)
+    elif count <= 12:
+        roles = ["🔫 Дон Мафии", "🕵️ Мафиози", "🕵️ Мафиози",
+                 "👨‍⚕️ Доктор", "🔍 Шериф", "👁️ Детектив", "💣 Маньяк"]
+        roles += ["👤 Мирный"] * (count - 7)
+    else:
+        roles = ["🔫 Дон Мафии", "🕵️ Мафиози", "🕵️ Мафиози", "🕵️ Мафиози",
+                 "👨‍⚕️ Доктор", "👨‍⚕️ Доктор", "🔍 Шериф", "👁️ Детектив", "💣 Маньяк", "🃏 Шут"]
+        roles += ["👤 Мирный"] * (count - 10)
+    random.shuffle(roles)
+    return roles
+
+# Хранилище активных игр: guild_id -> данные игры
+mafia_games = {}
+
+class MafiaGame:
+    def __init__(self, guild, channel, host):
+        self.guild = guild
+        self.channel = channel          # канал где запустили
+        self.host = host
+        self.players = []               # list of Member
+        self.roles = {}                 # member.id -> role str
+        self.alive = []                 # list of member.id
+        self.phase = "lobby"            # lobby / night / day / vote
+        self.night_num = 0
+        self.night_actions = {}         # role -> target member.id
+        self.votes = {}                 # voter_id -> target_id
+        self.last_healed = None         # доктор не лечит себя 2 ночи
+        self.detective_cooldown = 0
+        self.don_shield_used = False
+        self.corr_used = False
+        self.corr_override = {}         # voter_id -> forced target
+        # Каналы
+        self.ch_main = None
+        self.ch_chat = None
+        self.ch_mafia = None
+        self.ch_dead = None
+        # Сообщение с составом (закреплённое)
+        self.pinned_msg = None
+        self.lobby_msg = None
+
+    def get_role(self, uid): return self.roles.get(uid, "👤 Мирный")
+    def is_alive(self, uid): return uid in self.alive
+    def mafia_ids(self): return [uid for uid, r in self.roles.items() if get_role_team(r) == "mafia"]
+    def town_ids(self): return [uid for uid, r in self.roles.items() if get_role_team(r) == "town"]
+
+    def check_win(self):
+        alive_mafia = [uid for uid in self.alive if get_role_team(self.get_role(uid)) == "mafia"]
+        alive_town  = [uid for uid in self.alive if get_role_team(self.get_role(uid)) != "mafia"]
+        alive_maniac = [uid for uid in self.alive if get_role_team(self.get_role(uid)) == "maniac"]
+
+        if len(self.alive) == 1 and alive_maniac:
+            return "maniac"
+        if not alive_mafia:
+            return "town"
+        if len(alive_mafia) >= len(alive_town):
+            return "mafia"
+        return None
+
+
+async def mafia_create_channels(game: MafiaGame):
+    guild = game.guild
+    overwrites_hidden = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+    }
+    cat = None
+    for c in guild.categories:
+        if c.name == "🎭 МАФИЯ":
+            cat = c
+            break
+    if not cat:
+        cat = await guild.create_category("🎭 МАФИЯ")
+
+    game.ch_main  = await guild.create_text_channel("мафия-игра",  category=cat, overwrites=overwrites_hidden)
+    game.ch_chat  = await guild.create_text_channel("мафия-чат",   category=cat, overwrites=overwrites_hidden)
+    game.ch_mafia = await guild.create_text_channel("мафия-мафия", category=cat, overwrites=overwrites_hidden)
+    game.ch_dead  = await guild.create_text_channel("мафия-мёртвые", category=cat, overwrites=overwrites_hidden)
+
+    # Выдаём доступ живым игрокам к основным каналам
+    for m in game.players:
+        await game.ch_main.set_permissions(m, read_messages=True, send_messages=False)
+        await game.ch_dead.set_permissions(m, read_messages=True, send_messages=False)
+
+    # Мафия видит свой канал
+    for uid in game.mafia_ids():
+        m = game.guild.get_member(uid)
+        if m:
+            await game.ch_mafia.set_permissions(m, read_messages=True, send_messages=True)
+
+
+async def mafia_delete_channels(game: MafiaGame):
+    for ch in [game.ch_main, game.ch_chat, game.ch_mafia, game.ch_dead]:
+        if ch:
+            try:
+                await ch.delete()
+            except:
+                pass
+    # Удаляем категорию если пустая
+    if game.ch_main:
+        try:
+            cat = game.ch_main.category
+            if cat and len(cat.channels) == 0:
+                await cat.delete()
+        except:
+            pass
+
+
+async def mafia_update_pinned(game: MafiaGame):
+    lines = ["📋 **Игроки:**\n"]
+    for m in game.players:
+        uid = m.id
+        status = "✅" if game.is_alive(uid) else "💀"
+        lines.append(f"{status} {m.display_name}")
+    text = "\n".join(lines) + f"\n\n🌙 Ночь #{game.night_num}" if game.phase == "night" else "\n".join(lines)
+    if game.pinned_msg:
+        try:
+            await game.pinned_msg.edit(content=text)
+        except:
+            pass
+    else:
+        game.pinned_msg = await game.ch_main.send(text)
+        try:
+            await game.pinned_msg.pin()
+        except:
+            pass
+
+
+async def mafia_send_night_dms(game: MafiaGame):
+    """Отправить ночные ЛС всем живым игрокам"""
+    alive_members = [game.guild.get_member(uid) for uid in game.alive]
+    alive_members = [m for m in alive_members if m]
+
+    for m in alive_members:
+        role = game.get_role(m.id)
+        team = get_role_team(role)
+        desc = MAFIA_ROLES.get(role, {}).get("desc", "")
+        targets = [x for x in alive_members if x.id != m.id]
+
+        if not targets:
+            continue
+
+        try:
+            if role == "👨‍⚕️ Доктор":
+                view = MafiaNightActionView(game, m, targets, "heal")
+                await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**\n{desc}\n\nКого лечишь?", view=view)
+
+            elif role == "🔍 Шериф":
+                view = MafiaNightActionView(game, m, targets, "check")
+                await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**\n{desc}\n\nКого проверяешь?", view=view)
+
+            elif role == "👁️ Детектив":
+                if game.night_num % 2 == 1:
+                    view = MafiaNightActionView(game, m, targets, "detect")
+                    await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**\n{desc}\n\nКого изучаешь?", view=view)
+                else:
+                    await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**\n📵 Сегодня способность на перезарядке.")
+
+            elif role in ("🔫 Дон Мафии", "🕵️ Мафиози"):
+                mafia_names = ", ".join([
+                    game.guild.get_member(uid).display_name
+                    for uid in game.mafia_ids()
+                    if game.guild.get_member(uid) and uid != m.id
+                ])
+                mafia_str = f"\n🔴 Твои: {mafia_names}" if mafia_names else ""
+                view = MafiaNightActionView(game, m, targets, "kill")
+                await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**{mafia_str}\n\nКого убиваем?", view=view)
+
+            else:
+                await m.send(f"🌙 **Ночь #{game.night_num}** — ты **{role}**\n{desc}\n\n😴 Ложись спать, жди утра.")
+        except discord.Forbidden:
+            pass
+
+
+class MafiaNightActionView(discord.ui.View):
+    def __init__(self, game: MafiaGame, actor: discord.Member, targets: list, action: str):
+        super().__init__(timeout=60)
+        self.game = game
+        self.actor = actor
+        self.action = action
+        for t in targets[:20]:
+            self.add_item(MafiaNightTargetButton(game, actor, t, action))
+
+
+class MafiaNightTargetButton(discord.ui.Button):
+    def __init__(self, game: MafiaGame, actor: discord.Member, target: discord.Member, action: str):
+        super().__init__(label=target.display_name[:80], style=discord.ButtonStyle.primary)
+        self.game = game
+        self.actor = actor
+        self.target = target
+        self.action = action
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.actor.id:
+            await interaction.response.send_message("❌ Не твоя кнопка!", ephemeral=True)
+            return
+        self.game.night_actions[self.action + str(self.actor.id)] = self.target.id
+        self.view.stop()
+
+        role = self.game.get_role(self.actor.id)
+        if self.action == "heal":
+            await interaction.response.edit_message(content=f"💉 Ты лечишь **{self.target.display_name}** этой ночью.", view=None)
+        elif self.action == "check":
+            await interaction.response.edit_message(content=f"🔍 Проверяешь **{self.target.display_name}**... результат утром.", view=None)
+        elif self.action == "detect":
+            await interaction.response.edit_message(content=f"👁️ Изучаешь **{self.target.display_name}**... результат утром.", view=None)
+        elif self.action == "kill":
+            await interaction.response.edit_message(content=f"🔫 Цель выбрана: **{self.target.display_name}**.", view=None)
+            # Оповещаем остальных мафиози в канале мафии
+            if self.game.ch_mafia:
+                try:
+                    await self.game.ch_mafia.send(f"🔫 **{self.actor.display_name}** выбрал цель: **{self.target.display_name}**")
+                except:
+                    pass
+
+
+async def mafia_resolve_night(game: MafiaGame):
+    """Подводим итоги ночи"""
+    results = []
+
+    # Кто убит (берём первый kill-action от мафии)
+    killed_id = None
+    for uid in game.mafia_ids():
+        k = game.night_actions.get("kill" + str(uid))
+        if k:
+            killed_id = k
+            break
+
+    # Кого лечит доктор
+    healed_id = None
+    for uid, role in game.roles.items():
+        if role == "👨‍⚕️ Доктор":
+            h = game.night_actions.get("heal" + str(uid))
+            if h:
+                healed_id = h
+                # Нельзя лечить себя 2 раза подряд
+                if h == uid and game.last_healed == uid:
+                    healed_id = None
+                else:
+                    game.last_healed = h
+
+    # Применяем убийство
+    if killed_id and killed_id != healed_id:
+        if killed_id in game.alive:
+            game.alive.remove(killed_id)
+            victim = game.guild.get_member(killed_id)
+            results.append(f"💀 Ночью был убит **{victim.display_name if victim else killed_id}**")
+            # Переводим в мёртвые
+            if victim and game.ch_dead:
+                try:
+                    await game.ch_dead.set_permissions(victim, read_messages=True, send_messages=True)
+                    await game.ch_chat.set_permissions(victim, read_messages=False, send_messages=False)
+                except:
+                    pass
+    elif killed_id and killed_id == healed_id:
+        results.append("🏥 Доктор успел спасти жертву этой ночью! Никто не погиб.")
+
+    # Шериф — результат в ЛС
+    for uid, role in game.roles.items():
+        if role == "🔍 Шериф" and uid in game.alive:
+            t_id = game.night_actions.get("check" + str(uid))
+            if t_id:
+                t_member = game.guild.get_member(t_id)
+                t_role = game.get_role(t_id)
+                t_team = get_role_team(t_role)
+                result_str = "🔴 МАФИЯ" if t_team == "mafia" else "🟢 Мирный"
+                sheriff = game.guild.get_member(uid)
+                if sheriff:
+                    try:
+                        await sheriff.send(f"🔍 **Результат проверки:** {t_member.display_name if t_member else t_id} — {result_str}")
+                    except:
+                        pass
+
+    # Детектив — точная роль в ЛС
+    for uid, role in game.roles.items():
+        if role == "👁️ Детектив" and uid in game.alive:
+            t_id = game.night_actions.get("detect" + str(uid))
+            if t_id:
+                t_member = game.guild.get_member(t_id)
+                t_role = game.get_role(t_id)
+                det = game.guild.get_member(uid)
+                if det:
+                    try:
+                        await det.send(f"👁️ **Результат:** {t_member.display_name if t_member else t_id} — **{t_role}**")
+                    except:
+                        pass
+
+    game.night_actions.clear()
+    return results
+
+
+class MafiaVoteView(discord.ui.View):
+    def __init__(self, game: MafiaGame, alive_members: list):
+        super().__init__(timeout=45)
+        self.game = game
+        self.votes = {}
+        self.alive_ids = [m.id for m in alive_members]
+        for m in alive_members:
+            self.add_item(MafiaVoteButton(game, m, self))
+        self.add_item(MafiaSkipVoteButton(self))
+
+    def tally(self):
+        counts = {}
+        for voter, target in self.votes.items():
+            if target == "skip":
+                continue
+            # Коррупционер
+            real_target = self.game.corr_override.get(voter, target)
+            counts[real_target] = counts.get(real_target, 0) + 1
+        return counts
+
+
+class MafiaVoteButton(discord.ui.Button):
+    def __init__(self, game: MafiaGame, target: discord.Member, vote_view):
+        super().__init__(label=target.display_name[:80], style=discord.ButtonStyle.danger)
+        self.game = game
+        self.target = target
+        self.vote_view = vote_view
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id not in self.vote_view.alive_ids:
+            await interaction.response.send_message("❌ Ты не участник или уже выбыл!", ephemeral=True)
+            return
+        self.vote_view.votes[interaction.user.id] = self.target.id
+        await interaction.response.send_message(f"🗳️ Ты проголосовал за **{self.target.display_name}**", ephemeral=True)
+
+
+class MafiaSkipVoteButton(discord.ui.Button):
+    def __init__(self, vote_view):
+        super().__init__(label="⏭️ Пропустить", style=discord.ButtonStyle.secondary)
+        self.vote_view = vote_view
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id not in self.vote_view.alive_ids:
+            await interaction.response.send_message("❌ Ты не участник!", ephemeral=True)
+            return
+        self.vote_view.votes[interaction.user.id] = "skip"
+        await interaction.response.send_message("⏭️ Ты воздержался.", ephemeral=True)
+
+
+class MafiaNominateView(discord.ui.View):
+    """Кнопка выдвинуть на голосование — появляется в день"""
+    def __init__(self, game: MafiaGame):
+        super().__init__(timeout=120)
+        self.game = game
+        self.nominated = set()
+
+    @discord.ui.button(label="👆 Выдвинуть на голосование", style=discord.ButtonStyle.primary)
+    async def nominate(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id not in self.game.alive:
+            await interaction.response.send_message("❌ Ты уже выбыл!", ephemeral=True)
+            return
+        self.nominated.add(interaction.user.id)
+        count = len(self.nominated)
+        total = len(self.game.alive)
+        await interaction.response.send_message(
+            f"👆 **{interaction.user.display_name}** хочет начать голосование! ({count}/{total})",
+            ephemeral=False)
+
+
+async def mafia_run_game(game: MafiaGame):
+    """Основной цикл игры"""
+    guild_id = game.guild.id
+
+    await mafia_create_channels(game)
+
+    # Раздаём роли
+    roles_list = assign_roles(len(game.players))
+    for i, m in enumerate(game.players):
+        game.roles[m.id] = roles_list[i]
+        game.alive.append(m.id)
+
+    # Выдаём доступ к чату живым
+    for m in game.players:
+        await game.ch_chat.set_permissions(m, read_messages=True, send_messages=True)
+
+    # Отправляем роль в ЛС
+    for m in game.players:
+        role = game.get_role(m.id)
+        desc = MAFIA_ROLES.get(role, {}).get("desc", "")
+        try:
+            await m.send(
+                f"🎭 **Игра началась!**\n\n"
+                f"Твоя роль: **{role}**\n"
+                f"📖 {desc}\n\n"
+                f"Игра идёт в: {game.ch_main.mention}")
+        except discord.Forbidden:
+            pass
+
+    # Сообщение мафии в их канале
+    mafia_members = [game.guild.get_member(uid) for uid in game.mafia_ids()]
+    mafia_str = ", ".join([m.display_name for m in mafia_members if m])
+    await game.ch_mafia.send(
+        f"🔴 **Добро пожаловать, Мафия!**\n\n"
+        f"Ваша команда: **{mafia_str}**\n"
+        f"Общайтесь здесь в любое время — этот канал только для вас!")
+
+    await mafia_update_pinned(game)
+    await game.ch_main.send(
+        f"🎭 **Игра в мафию началась!** ({len(game.players)} игроков)\n\n"
+        f"📋 Роли розданы — проверьте ЛС!\n"
+        f"🗣️ Общий чат: {game.ch_chat.mention}\n"
+        f"💀 Мёртвые: {game.ch_dead.mention}")
+
+    await asyncio.sleep(5)
+
+    # ===== ИГРОВОЙ ЦИКЛ =====
+    while True:
+        win = game.check_win()
+        if win:
+            await mafia_end_game(game, win)
+            break
+
+        # ===== НОЧЬ =====
+        game.phase = "night"
+        game.night_num += 1
+
+        # Закрываем чат ночью
+        for m in [game.guild.get_member(uid) for uid in game.alive if game.guild.get_member(uid)]:
+            await game.ch_chat.set_permissions(m, read_messages=True, send_messages=False)
+
+        await game.ch_main.send(
+            f"🌙 **НОЧЬ #{game.night_num}**\n\n"
+            f"Город засыпает... Проверьте ЛС для своего действия!\n"
+            f"⏳ **60 секунд**")
+        await mafia_update_pinned(game)
+        await mafia_send_night_dms(game)
+        await asyncio.sleep(60)
+
+        # Подводим итоги ночи
+        night_results = await mafia_resolve_night(game)
+
+        # ===== ДЕНЬ =====
+        game.phase = "day"
+
+        # Открываем чат днём
+        for m in [game.guild.get_member(uid) for uid in game.alive if game.guild.get_member(uid)]:
+            await game.ch_chat.set_permissions(m, read_messages=True, send_messages=True)
+
+        result_text = "\n".join(night_results) if night_results else "😴 Тихая ночь — никто не погиб."
+        await game.ch_main.send(
+            f"☀️ **ДЕНЬ #{game.night_num}**\n\n"
+            f"{result_text}\n\n"
+            f"🗣️ Обсуждайте в {game.ch_chat.mention}!\n"
+            f"⏳ **2 минуты на обсуждение**")
+        await mafia_update_pinned(game)
+
+        win = game.check_win()
+        if win:
+            await mafia_end_game(game, win)
+            break
+
+        nominate_view = MafiaNomineateViewWrapper(game)
+        await game.ch_chat.send("👆 Хочешь начать голосование? Жми кнопку!", view=nominate_view)
+        await asyncio.sleep(120)
+
+        # ===== ГОЛОСОВАНИЕ =====
+        game.phase = "vote"
+        alive_members = [game.guild.get_member(uid) for uid in game.alive if game.guild.get_member(uid)]
+
+        vote_view = MafiaVoteView(game, alive_members)
+        vote_msg = await game.ch_main.send(
+            f"🗳️ **ГОЛОСОВАНИЕ!**\n\n"
+            f"Кого линчуем? У вас **45 секунд!**\n"
+            f"Живых игроков: {len(alive_members)}",
+            view=vote_view)
+
+        await asyncio.sleep(45)
+        vote_view.stop()
+
+        tally = vote_view.tally()
+        if not tally:
+            await game.ch_main.send("🤷 Никто не проголосовал. Никого не линчуют.")
+        else:
+            max_votes = max(tally.values())
+            top = [uid for uid, v in tally.items() if v == max_votes]
+            if len(top) > 1:
+                await game.ch_main.send(f"⚖️ **Ничья!** Никого не линчуют.")
+            else:
+                lynched_id = top[0]
+                lynched = game.guild.get_member(lynched_id)
+                lynched_role = game.get_role(lynched_id)
+                if lynched_id in game.alive:
+                    game.alive.remove(lynched_id)
+                # Раскрываем роль
+                await game.ch_main.send(
+                    f"⚖️ **{lynched.display_name if lynched else lynched_id}** линчован!\n"
+                    f"Его роль была: **{lynched_role}**")
+                # Шут победил?
+                if lynched_role == "🃏 Шут":
+                    await game.ch_main.send(f"🃏 **{lynched.display_name}** был Шутом и победил!")
+                    set_balance(lynched_id, get_balance(lynched_id) + 1000)
+                    await mafia_end_game(game, "jester", jester_id=lynched_id)
+                    break
+                # Переводим в мёртвые
+                if lynched and game.ch_dead:
+                    try:
+                        await game.ch_dead.set_permissions(lynched, read_messages=True, send_messages=True)
+                        await game.ch_chat.set_permissions(lynched, read_messages=False, send_messages=False)
+                    except:
+                        pass
+
+        game.corr_override.clear()
+        await mafia_update_pinned(game)
+
+        win = game.check_win()
+        if win:
+            await mafia_end_game(game, win)
+            break
+
+        await asyncio.sleep(3)
+
+
+class MafiaNomineateViewWrapper(discord.ui.View):
+    def __init__(self, game):
+        super().__init__(timeout=120)
+        self.game = game
+
+    @discord.ui.button(label="👆 Выдвинуть на голосование", style=discord.ButtonStyle.primary)
+    async def nominate(self, interaction: discord.Intera
