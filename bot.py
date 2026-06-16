@@ -2182,4 +2182,100 @@ class MafiaNomineateViewWrapper(discord.ui.View):
         self.game = game
 
     @discord.ui.button(label="👆 Выдвинуть на голосование", style=discord.ButtonStyle.primary)
-    async def nominate(self, interaction: discord.Intera
+    async def nominate(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id not in self.game.alive:
+            await interaction.response.send_message("❌ Ты уже выбыл!", ephemeral=True)
+            return
+        await interaction.response.send_message(
+            f"👆 **{interaction.user.display_name}** хочет начать голосование!",
+            ephemeral=False)
+
+
+async def mafia_end_game(game: MafiaGame, result: str, jester_id=None):
+    guild_id = game.guild.id
+    if result == "town":
+        text = "🟢 **МИРНЫЕ ПОБЕДИЛИ!** Вся мафия уничтожена!"
+        for uid in game.town_ids():
+            set_balance(uid, get_balance(uid) + 500)
+    elif result == "mafia":
+        text = "🔴 **МАФИЯ ПОБЕДИЛА!** Город захвачен!"
+        for uid in game.mafia_ids():
+            set_balance(uid, get_balance(uid) + 500)
+    elif result == "maniac":
+        text = "💣 **МАНЬЯК ПОБЕДИЛ!** Все уничтожены!"
+        for uid in game.alive:
+            set_balance(uid, get_balance(uid) + 500)
+    elif result == "jester":
+        text = f"🃏 **ШУТ ПОБЕДИЛ!**"
+    else:
+        text = "🏁 Игра завершена!"
+
+    # Раскрываем все роли
+    roles_reveal = "\n".join([
+        f"{game.guild.get_member(uid).display_name if game.guild.get_member(uid) else uid} — {role}"
+        for uid, role in game.roles.items()
+    ])
+    await game.ch_main.send(f"{text}\n\n📋 **Роли:**\n{roles_reveal}")
+    await asyncio.sleep(10)
+    await mafia_delete_channels(game)
+    if guild_id in mafia_games:
+        del mafia_games[guild_id]
+
+
+@tree.command(name="мафия", description="Запустить игру в мафию")
+async def мафия(interaction: discord.Interaction):
+    await interaction.response.defer()
+    guild_id = interaction.guild.id
+    if guild_id in mafia_games:
+        await interaction.followup.send("❌ Игра уже идёт!", ephemeral=True)
+        return
+    game = MafiaGame(interaction.guild, interaction.channel, interaction.user)
+    mafia_games[guild_id] = game
+    game.players.append(interaction.user)
+    view = MafiaLobbyView(game)
+    msg = await interaction.followup.send(
+        f"🎭 **Лобби мафии!**\n\n"
+        f"Игроки (1):\n• {interaction.user.display_name}\n\n"
+        f"Минимум 4 игрока. Нажми **Войти** для участия!",
+        view=view)
+    game.lobby_msg = msg
+
+
+class MafiaLobbyView(discord.ui.View):
+    def __init__(self, game: MafiaGame):
+        super().__init__(timeout=180)
+        self.game = game
+
+    @discord.ui.button(label="✅ Войти", style=discord.ButtonStyle.success)
+    async def join(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user in self.game.players:
+            await interaction.response.send_message("❌ Ты уже в игре!", ephemeral=True)
+            return
+        self.game.players.append(interaction.user)
+        names = "\n".join([f"• {m.display_name}" for m in self.game.players])
+        await interaction.response.edit_message(
+            content=f"🎭 **Лобби мафии!**\n\nИгроки ({len(self.game.players)}):\n{names}\n\nМинимум 4 игрока.",
+            view=self)
+
+    @discord.ui.button(label="🚀 Старт", style=discord.ButtonStyle.primary)
+    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.game.host.id:
+            await interaction.response.send_message("❌ Только хост может начать!", ephemeral=True)
+            return
+        if len(self.game.players) < 4:
+            await interaction.response.send_message("❌ Нужно минимум 4 игрока!", ephemeral=True)
+            return
+        await interaction.response.edit_message(content="🚀 **Игра начинается!**", view=None)
+        asyncio.create_task(mafia_run_game(self.game))
+
+    @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.game.host.id:
+            await interaction.response.send_message("❌ Только хост!", ephemeral=True)
+            return
+        del mafia_games[interaction.guild.id]
+        await interaction.response.edit_message(content="❌ Лобби отменено.", view=None)
+
+
+threading.Thread(target=run_web, daemon=True).start()
+client.run(DISCORD_TOKEN)
