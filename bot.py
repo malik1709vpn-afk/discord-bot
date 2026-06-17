@@ -1,4 +1,6 @@
-import discord
+import math
+import time
+Import discord
 from discord import app_commands
 import os
 import random
@@ -17,6 +19,31 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 BALANCE_FILE = "balance.json"
+
+LEVELS_FILE = "levels.json"
+user_last_message = {}
+
+LEVEL_ROLES = {
+    5: "Новичок",
+    10: "Опытный",
+    20: "Мастер",
+    50: "Легенда"
+}
+
+def get_level_reward(level):
+    if level <= 5: return 1000
+    elif level <= 15: return 5000
+    elif level <= 30: return 10000
+    elif level <= 60: return 20000
+    elif level <= 100: return 25000
+    return 0
+
+def get_level_data():
+    return load_file(LEVELS_FILE)
+
+def save_level_data(data):
+    save_file(LEVELS_FILE, data)
+
 FIGHTERS_FILE = "fighters.json"
 DECKS_FILE = "decks.json"
 
@@ -249,6 +276,38 @@ def load_file(path):
     return {}
 
 def save_file(path, data):
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+async def process_xp(member):
+    now = time.time()
+    if now - user_last_message.get(member.id, 0) < 5: return
+    user_last_message[member.id] = now
+    
+    data = get_level_data()
+    u_id = str(member.id)
+    u = data.get(u_id, {"xp": 0, "level": 1})
+    
+    xp_gain = random.randint(5, 15)
+    if member.voice and member.voice.channel and not member.voice.self_mute:
+        xp_gain += 5
+    
+    u["xp"] += xp_gain
+    new_level = int(math.sqrt(u["xp"]) / 10) + 1
+    
+    if new_level > u["level"]:
+        reward = get_level_reward(new_level)
+        set_balance(member.id, get_balance(member.id) + reward)
+        u["level"] = new_level
+        role_name = LEVEL_ROLES.get(new_level)
+        if role_name:
+            role = discord.utils.get(member.guild.roles, name=role_name)
+            if role: await member.add_roles(role)
+        await member.send(f"🎉 Вы апнули {new_level} уровень! Получили {reward} леккиров.")
+    
+    data[u_id] = u
+    save_level_data(data)
+
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
 
@@ -2177,105 +2236,37 @@ async def mafia_run_game(game: MafiaGame):
 
 
 class MafiaNomineateViewWrapper(discord.ui.View):
+
+    @discord.ui.button(label="🚪 Выйти из игры", style=discord.ButtonStyle.danger)
+    async def exit_game(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if hasattr(self.game, 'players') and interaction.user.id in self.game.players:
+            self.game.players.remove(interaction.user.id)
+            await interaction.response.send_message("Вы вышли из игры.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Вас нет в списке игроков.", ephemeral=True)
+
     def __init__(self, game):
         super().__init__(timeout=120)
         self.game = game
 
     @discord.ui.button(label="👆 Выдвинуть на голосование", style=discord.ButtonStyle.primary)
-    async def nominate(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id not in self.game.alive:
-            await interaction.response.send_message("❌ Ты уже выбыл!", ephemeral=True)
-            return
-        await interaction.response.send_message(
-            f"👆 **{interaction.user.display_name}** хочет начать голосование!",
-            ephemeral=False)
+    async def nominate(self, interaction: discord.Intera
+                       
+@tree.command(name="накуровень", description="Накрутить уровень")
+async def add_level(interaction: discord.Interaction, member: discord.Member, amount: int):
+    data = get_level_data()
+    u = data.get(str(member.id), {"xp": 0, "level": 1})
+    u["level"] += amount
+    data[str(member.id)] = u
+    save_level_data(data)
+    await interaction.response.send_message(f"Уровень {member.mention} повышен на {amount}.")
 
+@tree.command(name="лидеры", description="Топ по уровням")
+async def leaderboard(interaction: discord.Interaction):
+    data = get_level_data()
+    sorted_users = sorted(data.items(), key=lambda x: x[1]['level'], reverse=True)[:10]
+    msg = "🏆 Топ 10 по уровням:\n"
+    for i, (uid, u) in enumerate(sorted_users, 1):
+        msg += f"{i}. <@{uid}> - Уровень {u['level']}\n"
+    await interaction.response.send_message(msg)
 
-async def mafia_end_game(game: MafiaGame, result: str, jester_id=None):
-    guild_id = game.guild.id
-    if result == "town":
-        text = "🟢 **МИРНЫЕ ПОБЕДИЛИ!** Вся мафия уничтожена!"
-        for uid in game.town_ids():
-            set_balance(uid, get_balance(uid) + 500)
-    elif result == "mafia":
-        text = "🔴 **МАФИЯ ПОБЕДИЛА!** Город захвачен!"
-        for uid in game.mafia_ids():
-            set_balance(uid, get_balance(uid) + 500)
-    elif result == "maniac":
-        text = "💣 **МАНЬЯК ПОБЕДИЛ!** Все уничтожены!"
-        for uid in game.alive:
-            set_balance(uid, get_balance(uid) + 500)
-    elif result == "jester":
-        text = f"🃏 **ШУТ ПОБЕДИЛ!**"
-    else:
-        text = "🏁 Игра завершена!"
-
-    # Раскрываем все роли
-    roles_reveal = "\n".join([
-        f"{game.guild.get_member(uid).display_name if game.guild.get_member(uid) else uid} — {role}"
-        for uid, role in game.roles.items()
-    ])
-    await game.ch_main.send(f"{text}\n\n📋 **Роли:**\n{roles_reveal}")
-    await asyncio.sleep(10)
-    await mafia_delete_channels(game)
-    if guild_id in mafia_games:
-        del mafia_games[guild_id]
-
-
-@tree.command(name="мафия", description="Запустить игру в мафию")
-async def мафия(interaction: discord.Interaction):
-    await interaction.response.defer()
-    guild_id = interaction.guild.id
-    if guild_id in mafia_games:
-        await interaction.followup.send("❌ Игра уже идёт!", ephemeral=True)
-        return
-    game = MafiaGame(interaction.guild, interaction.channel, interaction.user)
-    mafia_games[guild_id] = game
-    game.players.append(interaction.user)
-    view = MafiaLobbyView(game)
-    msg = await interaction.followup.send(
-        f"🎭 **Лобби мафии!**\n\n"
-        f"Игроки (1):\n• {interaction.user.display_name}\n\n"
-        f"Минимум 4 игрока. Нажми **Войти** для участия!",
-        view=view)
-    game.lobby_msg = msg
-
-
-class MafiaLobbyView(discord.ui.View):
-    def __init__(self, game: MafiaGame):
-        super().__init__(timeout=180)
-        self.game = game
-
-    @discord.ui.button(label="✅ Войти", style=discord.ButtonStyle.success)
-    async def join(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user in self.game.players:
-            await interaction.response.send_message("❌ Ты уже в игре!", ephemeral=True)
-            return
-        self.game.players.append(interaction.user)
-        names = "\n".join([f"• {m.display_name}" for m in self.game.players])
-        await interaction.response.edit_message(
-            content=f"🎭 **Лобби мафии!**\n\nИгроки ({len(self.game.players)}):\n{names}\n\nМинимум 4 игрока.",
-            view=self)
-
-    @discord.ui.button(label="🚀 Старт", style=discord.ButtonStyle.primary)
-    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.game.host.id:
-            await interaction.response.send_message("❌ Только хост может начать!", ephemeral=True)
-            return
-        if len(self.game.players) < 4:
-            await interaction.response.send_message("❌ Нужно минимум 4 игрока!", ephemeral=True)
-            return
-        await interaction.response.edit_message(content="🚀 **Игра начинается!**", view=None)
-        asyncio.create_task(mafia_run_game(self.game))
-
-    @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.game.host.id:
-            await interaction.response.send_message("❌ Только хост!", ephemeral=True)
-            return
-        del mafia_games[interaction.guild.id]
-        await interaction.response.edit_message(content="❌ Лобби отменено.", view=None)
-
-
-threading.Thread(target=run_web, daemon=True).start()
-client.run(DISCORD_TOKEN)
