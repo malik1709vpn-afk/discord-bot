@@ -1,6 +1,6 @@
 import math
 import time
-Import discord
+import discord
 from discord import app_commands
 import os
 import random
@@ -24,10 +24,10 @@ LEVELS_FILE = "levels.json"
 user_last_message = {}
 
 LEVEL_ROLES = {
-    5: "Новичок",
-    10: "Опытный",
-    20: "Мастер",
-    50: "Легенда"
+    1: "😀Новичок(1 лвл)",
+    5: "😎Привыкший(5 лвл)",
+    10: "😊Знакомый(10 лвл)",
+    20: "🕹️Активный(20 лвл)",
 }
 
 def get_level_reward(level):
@@ -43,6 +43,33 @@ def get_level_data():
 
 def save_level_data(data):
     save_file(LEVELS_FILE, data)
+
+def get_target_level_role_name(level):
+    """Самая высокая роль-уровня, которая уже открыта при данном level."""
+    achieved = [lvl for lvl in LEVEL_ROLES if level >= lvl]
+    if not achieved:
+        return None
+    return LEVEL_ROLES[max(achieved)]
+
+async def apply_level_role(member: discord.Member, level: int):
+    """Выдаёт нужную роль за уровень и снимает более младшие роли-уровня.
+    Используется и при левел-апе, и при возвращении участника на сервер."""
+    target_name = get_target_level_role_name(level)
+    if not target_name or not member.guild:
+        return
+    for lvl, role_name in LEVEL_ROLES.items():
+        role_obj = discord.utils.get(member.guild.roles, name=role_name)
+        if not role_obj:
+            continue
+        try:
+            if role_name == target_name:
+                if role_obj not in member.roles:
+                    await member.add_roles(role_obj)
+            else:
+                if role_obj in member.roles:
+                    await member.remove_roles(role_obj)
+        except:
+            pass
 
 FIGHTERS_FILE = "fighters.json"
 DECKS_FILE = "decks.json"
@@ -299,17 +326,14 @@ async def process_xp(member):
         reward = get_level_reward(new_level)
         set_balance(member.id, get_balance(member.id) + reward)
         u["level"] = new_level
-        role_name = LEVEL_ROLES.get(new_level)
-        if role_name:
-            role = discord.utils.get(member.guild.roles, name=role_name)
-            if role: await member.add_roles(role)
-        await member.send(f"🎉 Вы апнули {new_level} уровень! Получили {reward} леккиров.")
+        await apply_level_role(member, new_level)
+        try:
+            await member.send(f"🎉 Вы апнули {new_level} уровень! Получили {reward} ликкеров.")
+        except:
+            pass
     
     data[u_id] = u
     save_level_data(data)
-
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False)
 
 def get_balance(user_id):
     data = load_file(BALANCE_FILE)
@@ -444,6 +468,28 @@ async def on_ready():
     print(f"Бот запущен: {client.user}")
     client.loop.create_task(bonus_loop())
     client.loop.create_task(income_loop())
+
+@client.event
+async def on_message(message):
+    if message.author.bot or not message.guild:
+        return
+    await process_xp(message.author)
+
+@client.event
+async def on_member_join(member):
+    if member.bot:
+        return
+    # Стартовая валюта — только тем, кого мы видим первый раз
+    bal_data = load_file(BALANCE_FILE)
+    uid = str(member.id)
+    if uid not in bal_data:
+        bal_data[uid] = 1000
+        save_file(BALANCE_FILE, bal_data)
+    # Возвращаем роль за уровень, если участник уже играл раньше (уровень/опыт не теряются при выходе)
+    level_data = get_level_data()
+    u = level_data.get(uid)
+    if u:
+        await apply_level_role(member, u.get("level", 1))
 
 # ===== МАГАЗИН =====
 class ShopMainView(discord.ui.View):
@@ -1736,6 +1782,7 @@ def assign_roles(count):
 
 # Хранилище активных игр: guild_id -> данные игры
 mafia_games = {}
+MAFIA_MIN_PLAYERS = 4
 
 class MafiaGame:
     def __init__(self, guild, channel, host):
@@ -1754,6 +1801,7 @@ class MafiaGame:
         self.don_shield_used = False
         self.corr_used = False
         self.corr_override = {}         # voter_id -> forced target
+        self.ended = False              # защита от повторного завершения игры
         # Каналы
         self.ch_main = None
         self.ch_chat = None
@@ -2159,114 +2207,4 @@ async def mafia_run_game(game: MafiaGame):
 
         # Открываем чат днём
         for m in [game.guild.get_member(uid) for uid in game.alive if game.guild.get_member(uid)]:
-            await game.ch_chat.set_permissions(m, read_messages=True, send_messages=True)
-
-        result_text = "\n".join(night_results) if night_results else "😴 Тихая ночь — никто не погиб."
-        await game.ch_main.send(
-            f"☀️ **ДЕНЬ #{game.night_num}**\n\n"
-            f"{result_text}\n\n"
-            f"🗣️ Обсуждайте в {game.ch_chat.mention}!\n"
-            f"⏳ **2 минуты на обсуждение**")
-        await mafia_update_pinned(game)
-
-        win = game.check_win()
-        if win:
-            await mafia_end_game(game, win)
-            break
-
-        nominate_view = MafiaNomineateViewWrapper(game)
-        await game.ch_chat.send("👆 Хочешь начать голосование? Жми кнопку!", view=nominate_view)
-        await asyncio.sleep(120)
-
-        # ===== ГОЛОСОВАНИЕ =====
-        game.phase = "vote"
-        alive_members = [game.guild.get_member(uid) for uid in game.alive if game.guild.get_member(uid)]
-
-        vote_view = MafiaVoteView(game, alive_members)
-        vote_msg = await game.ch_main.send(
-            f"🗳️ **ГОЛОСОВАНИЕ!**\n\n"
-            f"Кого линчуем? У вас **45 секунд!**\n"
-            f"Живых игроков: {len(alive_members)}",
-            view=vote_view)
-
-        await asyncio.sleep(45)
-        vote_view.stop()
-
-        tally = vote_view.tally()
-        if not tally:
-            await game.ch_main.send("🤷 Никто не проголосовал. Никого не линчуют.")
-        else:
-            max_votes = max(tally.values())
-            top = [uid for uid, v in tally.items() if v == max_votes]
-            if len(top) > 1:
-                await game.ch_main.send(f"⚖️ **Ничья!** Никого не линчуют.")
-            else:
-                lynched_id = top[0]
-                lynched = game.guild.get_member(lynched_id)
-                lynched_role = game.get_role(lynched_id)
-                if lynched_id in game.alive:
-                    game.alive.remove(lynched_id)
-                # Раскрываем роль
-                await game.ch_main.send(
-                    f"⚖️ **{lynched.display_name if lynched else lynched_id}** линчован!\n"
-                    f"Его роль была: **{lynched_role}**")
-                # Шут победил?
-                if lynched_role == "🃏 Шут":
-                    await game.ch_main.send(f"🃏 **{lynched.display_name}** был Шутом и победил!")
-                    set_balance(lynched_id, get_balance(lynched_id) + 1000)
-                    await mafia_end_game(game, "jester", jester_id=lynched_id)
-                    break
-                # Переводим в мёртвые
-                if lynched and game.ch_dead:
-                    try:
-                        await game.ch_dead.set_permissions(lynched, read_messages=True, send_messages=True)
-                        await game.ch_chat.set_permissions(lynched, read_messages=False, send_messages=False)
-                    except:
-                        pass
-
-        game.corr_override.clear()
-        await mafia_update_pinned(game)
-
-        win = game.check_win()
-        if win:
-            await mafia_end_game(game, win)
-            break
-
-        await asyncio.sleep(3)
-
-
-class MafiaNomineateViewWrapper(discord.ui.View):
-
-    @discord.ui.button(label="🚪 Выйти из игры", style=discord.ButtonStyle.danger)
-    async def exit_game(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if hasattr(self.game, 'players') and interaction.user.id in self.game.players:
-            self.game.players.remove(interaction.user.id)
-            await interaction.response.send_message("Вы вышли из игры.", ephemeral=True)
-        else:
-            await interaction.response.send_message("Вас нет в списке игроков.", ephemeral=True)
-
-    def __init__(self, game):
-        super().__init__(timeout=120)
-        self.game = game
-
-    @discord.ui.button(label="👆 Выдвинуть на голосование", style=discord.ButtonStyle.primary)
-    async def nominate(self, interaction: discord.Intera
-                       
-@tree.command(name="накуровень", description="Накрутить уровень")
-async def add_level(interaction: discord.Interaction, member: discord.Member, amount: int):
-    data = get_level_data()
-    u = data.get(str(member.id), {"xp": 0, "level": 1})
-    u["level"] += amount
-    data[str(member.id)] = u
-    save_level_data(data)
-    await interaction.response.send_message(f"Уровень {member.mention} повышен на {amount}.")
-
-@tree.command(name="лидеры", description="Топ по уровням")
-async def leaderboard(interaction: discord.Interaction):
-    data = get_level_data()
-    sorted_users = sorted(data.items(), key=lambda x: x[1]['level'], reverse=True)[:10]
-    msg = "🏆 Топ 10 по уровням:\n"
-    for i, (uid, u) in enumerate(sorted_users, 1):
-        msg += f"{i}. <@{uid}> - Уровень {u['level']}\n"
-    await interaction.response.send_message(msg)
-
+            await game.ch_chat.set_permissions(m, read_messages=True, send_mes
